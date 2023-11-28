@@ -11,6 +11,7 @@ import java.util.Arrays;
 public class Main {
     public static void main(String[] args) {
         Grid grid = GridFileReader.getGridfromConfigFile("Overcooked 1_1/MapGridConfiguration.txt");
+        System.out.println(Arrays.deepToString(grid.getGrid()));
         OvercookedPlannerApp.plan(grid);
     }
 }
