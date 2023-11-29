@@ -1,6 +1,7 @@
 package org.example.solver;
 
 import org.example.constraints.OvercookedConstraintProvider;
+import org.example.domain.Character;
 import org.example.domain.CharacterOrCharacterStep;
 import org.example.domain.CharacterStep;
 import org.example.domain.Grid;
@@ -26,9 +27,9 @@ public class OvercookedPlannerApp {
     public static void plan(Grid grid) {
         SolverFactory<OvercookedPlanner> solverFactory = SolverFactory.create(new SolverConfig()
                 .withSolutionClass(OvercookedPlanner.class)
-                .withEntityClassList(List.of(CharacterStep.class, CharacterOrCharacterStep.class))
+                .withEntityClasses(CharacterStep.class)
+                //.withEntityClassList(List.of(CharacterStep.class, CharacterOrCharacterStep.class))
                 .withConstraintProviderClass(OvercookedConstraintProvider.class)
-
                 // The solver runs only for 5 seconds on this small dataset.
                 // It's recommended to run for at least 5 minutes ("5m") otherwise.
                 .withTerminationSpentLimit(Duration.ofSeconds(5)));
@@ -63,7 +64,17 @@ public class OvercookedPlannerApp {
 
             return new OvercookedPlanner(...);
         */
-        return null;
+
+        List<Character> characterList = new ArrayList<>();
+        characterList.add(new Character("1"));
+        characterList.add(new Character("2"));
+
+        List<CharacterStep> stepList = new ArrayList<>();
+        long id = 0;
+        stepList.add(new CharacterStep(id++));
+        stepList.add(new CharacterStep(id));
+
+        return new OvercookedPlanner(characterList, stepList);
     }
 
     private static void printPlan(OvercookedPlanner plan) {

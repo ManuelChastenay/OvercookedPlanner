@@ -1,6 +1,7 @@
 package org.example.domain;
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
@@ -25,6 +26,9 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
  */
 @PlanningEntity
 public class CharacterStep extends CharacterOrCharacterStep {
+    @PlanningId
+    private Long id;
+
     @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
     private CharacterOrCharacterStep previousStep;
 
@@ -37,6 +41,17 @@ public class CharacterStep extends CharacterOrCharacterStep {
 
     //À ajouter: Toute la logique des actions et des déplacements.
     //Les contraintes d'actions à faire avant telle autre seront ajoutées dans la section de contraintes correspondante.
+
+    public CharacterStep() {
+    }
+
+    public CharacterStep(long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
 
     public CharacterOrCharacterStep getPreviousStep() {
         return previousStep;

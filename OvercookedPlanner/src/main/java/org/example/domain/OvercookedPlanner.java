@@ -19,12 +19,22 @@ public class OvercookedPlanner {
     private List<Room> roomList;
     @PlanningEntityCollectionProperty
     private List<Lesson> lessonList;*/
+    @ProblemFactCollectionProperty
+    @ValueRangeProvider
+    private List<Character> characters;
+
+    @PlanningEntityCollectionProperty
+    private List<CharacterStep> characterSteps;
 
     @PlanningScore
     private HardSoftScore score;
 
     // No-arg constructor required for OptaPlanner
-    public OvercookedPlanner() {
+    public OvercookedPlanner() {}
+
+    public OvercookedPlanner(List<Character> characters, List<CharacterStep> characterSteps) {
+        this.characters = characters;
+        this.characterSteps = characterSteps;
     }
 
     /*public OvercookedPlanner(List<Timeslot> timeslotList, List<Room> roomList, List<Lesson> lessonList) {
@@ -32,4 +42,12 @@ public class OvercookedPlanner {
         this.roomList = roomList;
         this.lessonList = lessonList;
     }*/
+
+    public List<Character> getCharacterList() {
+        return characters;
+    }
+
+    public List<CharacterStep> getCharacterStepList() {
+        return characterSteps;
+    }
 }
