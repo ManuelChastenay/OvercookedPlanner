@@ -22,8 +22,10 @@ public class OvercookedConstraintProvider implements ConstraintProvider {
     Constraint minimizeDistanceFromPreviousStep(ConstraintFactory constraintFactory) {
         // TODO remove dumb constraint
         return constraintFactory
-                .forEachUniquePair(CharacterStep.class)
-                .reward(HardSoftScore.ONE_SOFT)
+                .forEachUniquePair(CharacterStep.class,
+                    Joiners.equal(CharacterStep::getCharacter)
+                )
+                .penalize(HardSoftScore.ONE_HARD)
                 .asConstraint("Yeah");
     }
 }

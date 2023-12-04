@@ -78,6 +78,13 @@ public class OvercookedPlannerApp {
     }
 
     private static void printPlan(OvercookedPlanner plan) {
-        LOGGER.info("Not implemented");
+        LOGGER.info("");
+        for (CharacterStep step:
+             plan.getCharacterStepList()) {
+            LOGGER.info("Step " + step.getId().toString());
+            LOGGER.info("Executed by character " + step.getCharacter().getId());
+            LOGGER.info("Next step : " + step.getNextStep());
+            LOGGER.info("");
+        }
     }
 }
