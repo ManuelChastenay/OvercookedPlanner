@@ -1,14 +1,11 @@
 package org.example.utils;
 
-import org.example.Main;
-import org.example.domain.Grid;
+import org.example.domain.grid.Grid;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class GridFileReader {
@@ -26,8 +23,10 @@ public class GridFileReader {
                 String line = fileScanner.nextLine();
                 if(line.isEmpty()) continue;
 
-                for (int j = 0; j < width; j++) {
-                    grid[i][j] = Character.toString(line.charAt(j));
+                int j = 0;
+                for (String word : line.split(" ")){
+                    grid[i][j] = word;
+                    j++;
                 }
                 i++;
             }

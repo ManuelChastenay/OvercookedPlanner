@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.domain.Grid;
+import org.example.domain.grid.Grid;
 import org.example.solver.OvercookedPlannerApp;
 import org.example.utils.GridFileReader;
 
@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class Main {
     public static void main(String[] args) {
         Grid grid = GridFileReader.getGridfromConfigFile("Overcooked 1_1/MapGridConfiguration.txt");
-        System.out.println(Arrays.deepToString(grid.getGrid()));
+        System.out.println(grid);
         OvercookedPlannerApp.plan(grid);
     }
 }

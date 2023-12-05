@@ -2,9 +2,8 @@ package org.example.solver;
 
 import org.example.constraints.OvercookedConstraintProvider;
 import org.example.domain.Character;
-import org.example.domain.CharacterOrCharacterStep;
 import org.example.domain.CharacterStep;
-import org.example.domain.Grid;
+import org.example.domain.grid.Grid;
 import org.example.domain.OvercookedPlanner;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
@@ -12,14 +11,9 @@ import org.optaplanner.core.config.solver.SolverConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.DayOfWeek;
 import java.time.Duration;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class OvercookedPlannerApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(OvercookedPlannerApp.class);
