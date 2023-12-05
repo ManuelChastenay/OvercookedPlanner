@@ -7,23 +7,23 @@ import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
  * Base class for implementing the chained graph modelling strategy.
  *
  * @see Character
- * @see CharacterStep
+ * @see TaskAssignment
  */
 @PlanningEntity
-public abstract class CharacterOrCharacterStep {
-    public static final String PREVIOUS_STEP = "previousStep";
+public abstract class CharacterOrTaskAssignment {
+    public static final String PREVIOUS_TASK = "previousTask";
 
     /**
      * Shadow variable: Is automatically set by the Solver and facilitates that all the elements in the chain, the
      * Trolley and the TrolleyStep, can have a reference to the next element in that chain.
      */
-    @InverseRelationShadowVariable(sourceVariableName = PREVIOUS_STEP)
-    protected CharacterStep nextStep;
+    @InverseRelationShadowVariable(sourceVariableName = PREVIOUS_TASK)
+    protected TaskAssignment nextStep;
 
-    public CharacterStep getNextStep() {
+    public TaskAssignment getNextStep() {
         return nextStep;
     }
-    public void setNextStep(CharacterStep nextStep) {
+    public void setNextStep(TaskAssignment nextStep) {
         this.nextStep = nextStep;
     }
 }

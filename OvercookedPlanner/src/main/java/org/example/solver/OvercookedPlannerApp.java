@@ -1,10 +1,12 @@
 package org.example.solver;
 
-import org.example.constraints.OvercookedConstraintProvider;
+import org.example.constraints.RecipeConstraintProvider;
 import org.example.domain.Character;
-import org.example.domain.CharacterStep;
+import org.example.domain.TaskAssignment;
+import org.example.domain.RecipeRepository;
+import org.example.domain.actions.Task;
 import org.example.domain.grid.Grid;
-import org.example.domain.OvercookedPlanner;
+import org.example.domain.Recipe;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.optaplanner.core.config.solver.SolverConfig;
@@ -19,65 +21,47 @@ public class OvercookedPlannerApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(OvercookedPlannerApp.class);
 
     public static void plan(Grid grid) {
-        SolverFactory<OvercookedPlanner> solverFactory = SolverFactory.create(new SolverConfig()
-                .withSolutionClass(OvercookedPlanner.class)
-                .withEntityClasses(CharacterStep.class)
-                //.withEntityClassList(List.of(CharacterStep.class, CharacterOrCharacterStep.class))
-                .withConstraintProviderClass(OvercookedConstraintProvider.class)
-                // The solver runs only for 5 seconds on this small dataset.
-                // It's recommended to run for at least 5 minutes ("5m") otherwise.
-                .withTerminationSpentLimit(Duration.ofSeconds(5)));
+        SolverFactory<Recipe> solverFactory = SolverFactory.create(new SolverConfig()
+                .withSolutionClass(Recipe.class)
+                .withEntityClasses(Task.class, TaskAssignment.class)
+                .withConstraintProviderClass(RecipeConstraintProvider.class)
+                .withTerminationSpentLimit(Duration.ofSeconds(15))
+                //.withTerminationConfig(new TerminationConfig().withBestScoreLimit("-5hard/0soft"))
+        );
 
         // Load the problem
-        OvercookedPlanner problem = generateDemoData();
+        // TODO: Ajouter une classe comme Menu pour regrouper un collection de recettes.
+        Recipe problem = generateDemoData();
 
         // Solve the problem
-        Solver<OvercookedPlanner> solver = solverFactory.buildSolver();
-        OvercookedPlanner solution = solver.solve(problem);
+        Solver<Recipe> solver = solverFactory.buildSolver();
+        Recipe solution = solver.solve(problem);
 
         // Visualize the solution
         printPlan(solution);
     }
 
-    public static OvercookedPlanner generateDemoData() {
-        /*
-            List<Timeslot> timeslotList = new ArrayList<>(10);
-            timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(8, 30), LocalTime.of(9, 30)));
-            timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(9, 30), LocalTime.of(10, 30)));
+    public static Recipe generateDemoData() {
+        List<Character> characters = new ArrayList<>();
+        characters.add(new Character("0"));
 
-            List<Room> roomList = new ArrayList<>(3);
-            roomList.add(new Room("Room A"));
-            roomList.add(new Room("Room B"));
+        List<String> recipesToFetch = new ArrayList<>();
+        recipesToFetch.add(RecipeRepository.ONION_SOUP_RECIPE);
 
-            List<Lesson> lessonList = new ArrayList<>();
-            long id = 0;
+        RecipeRepository repository = new RecipeRepository();
+        List<Recipe> recipes = repository.getRecipes(recipesToFetch);
+        recipes.forEach(recipe -> recipe.setCharactersAndTaskAssignments(characters));
 
-            lessonList.add(new Lesson(id++, "Math", "A. Turing", "9th grade"));
-            lessonList.add(new Lesson(id++, "Math", "A. Turing", "10th grade"));
-            ...
-
-            return new OvercookedPlanner(...);
-        */
-
-        List<Character> characterList = new ArrayList<>();
-        characterList.add(new Character("1"));
-        characterList.add(new Character("2"));
-
-        List<CharacterStep> stepList = new ArrayList<>();
-        long id = 0;
-        stepList.add(new CharacterStep(id++));
-        stepList.add(new CharacterStep(id));
-
-        return new OvercookedPlanner(characterList, stepList);
+        // TODO: Retourner la liste complète une fois la classe Menu implémentée
+        return recipes.get(0);
     }
 
-    private static void printPlan(OvercookedPlanner plan) {
+    private static void printPlan(Recipe recipe) {
         LOGGER.info("");
-        for (CharacterStep step:
-             plan.getCharacterStepList()) {
-            LOGGER.info("Step " + step.getId().toString());
-            LOGGER.info("Executed by character " + step.getCharacter().getId());
-            LOGGER.info("Next step : " + step.getNextStep());
+        for (TaskAssignment task:
+                recipe.getTaskAssignments()) {
+            LOGGER.info("Task: " + task.getTask().getTaskName());
+            LOGGER.info("Executed by character: " + task.getCharacter().getId());
             LOGGER.info("");
         }
     }

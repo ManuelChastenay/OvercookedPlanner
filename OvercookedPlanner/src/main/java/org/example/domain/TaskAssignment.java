@@ -1,5 +1,6 @@
 package org.example.domain;
 
+import org.example.domain.actions.Task;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
@@ -11,9 +12,9 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
  * Represents a "stop" in a character's path where an action is to be done.
  * The CharacterStep is the only PlanningEntity entity that will be changed during the problem-solving, and the
- *  {@link CharacterStep#previousStep} is the only PlanningVariable defined.
- * By using the CHAINED graph modelling strategy, combined with shadow variables {@link CharacterStep#character} and
- *  {@link CharacterOrCharacterStep#nextStep}, the Solver will create a structure like the following:
+ *  {@link TaskAssignment#previousStep} is the only PlanningVariable defined.
+ * By using the CHAINED graph modelling strategy, combined with shadow variables {@link TaskAssignment#character} and
+ *  {@link CharacterOrTaskAssignment#nextStep}, the Solver will create a structure like the following:
  * Character1 <-> CharacterStep1 <-> CharacterStep2 <-> CharacterStep3 -> end
  * Character2 <-> ...
 
@@ -25,40 +26,38 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
  * element).
  */
 @PlanningEntity
-public class CharacterStep extends CharacterOrCharacterStep {
+public class TaskAssignment extends CharacterOrTaskAssignment {
+    //TODO: Change to startTime
     @PlanningId
-    private Long id;
+    private int id;
 
-    @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
-    private CharacterOrCharacterStep previousStep;
+    private Task task;
 
     /**
      * Shadow variable: Is automatically set by the Solver and facilitates that all the character steps can have a
      * reference to the chain "anchor", the Character.
      */
-    @AnchorShadowVariable(sourceVariableName = PREVIOUS_STEP)
+    @AnchorShadowVariable(sourceVariableName = PREVIOUS_TASK)
     private Character character;
 
-    //À ajouter: Toute la logique des actions et des déplacements.
-    //Les contraintes d'actions à faire avant telle autre seront ajoutées dans la section de contraintes correspondante.
+    @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
+    private CharacterOrTaskAssignment previousTask;
 
-    public CharacterStep() {
+    public TaskAssignment() {
     }
 
-    public CharacterStep(long id) {
+    public TaskAssignment(int id, Task task, Character character) {
         this.id = id;
+        this.task = task;
+        this.character = character;
     }
 
-    public Long getId() {
-        return id;
+    public Task getTask() {
+        return task;
     }
 
-    public CharacterOrCharacterStep getPreviousStep() {
-        return previousStep;
-    }
-
-    public void setPreviousStep(CharacterOrCharacterStep previousStep) {
-        this.previousStep = previousStep;
+    public void setTask(Task task) {
+        this.task = task;
     }
 
     public Character getCharacter() {
@@ -69,7 +68,7 @@ public class CharacterStep extends CharacterOrCharacterStep {
         this.character = character;
     }
 
-    public boolean isLast() {
-        return nextStep == null;
+    public int getId(){
+        return id;
     }
 }

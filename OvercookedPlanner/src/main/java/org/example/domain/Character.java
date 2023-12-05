@@ -1,7 +1,10 @@
 package org.example.domain;
 
-public class Character extends CharacterOrCharacterStep{
+import org.example.domain.actions.Task;
+
+public class Character extends CharacterOrTaskAssignment {
     private String id;
+    private Task currentTask;
 
     public Character(String id) {
         this.id = id;
@@ -13,5 +16,13 @@ public class Character extends CharacterOrCharacterStep{
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Task getCurrentTask() {
+        return currentTask;
+    }
+
+    public void setCurrentTask(Task currentTask) {
+        this.currentTask = currentTask;
     }
 }
