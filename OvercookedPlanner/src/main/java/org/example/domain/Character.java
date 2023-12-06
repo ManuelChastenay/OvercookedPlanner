@@ -1,10 +1,11 @@
 package org.example.domain;
 
 import org.example.domain.actions.Task;
+import org.optaplanner.core.api.domain.entity.PlanningEntity;
 
 public class Character extends CharacterOrTaskAssignment {
     private String id;
-    private Task currentTask;
+    //private Task currentTask;
 
     public Character() {
 
@@ -22,11 +23,11 @@ public class Character extends CharacterOrTaskAssignment {
         this.id = id;
     }
 
-    public Task getCurrentTask() {
+    /*public Task getCurrentTask() {
         return currentTask;
     }
 
     public void setCurrentTask(Task currentTask) {
         this.currentTask = currentTask;
-    }
+    }*/
 }
