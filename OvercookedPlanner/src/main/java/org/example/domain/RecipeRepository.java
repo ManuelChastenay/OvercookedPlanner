@@ -64,7 +64,7 @@ public class RecipeRepository {
         taskList.add(serveSoupTask);
 
         //TODO Remove, test purposes
-        taskList = taskList.reversed();
+        //taskList = taskList.reversed();
 
         onionSoup.setTasks(taskList);
         repository.put(ONION_SOUP_RECIPE, onionSoup);
