@@ -21,11 +21,11 @@ public class Task{
 
     private Recipe currentRecipe;
 
-    //@PlanningVariable(valueRangeProviderRefs = {"taskRange"})
+    @PlanningVariable(valueRangeProviderRefs = {"taskRange"})
     private Task dependentTask;
 
     //TODO Faire fonctionner les choix du solveur sur cette variable
-    @PlanningVariable(valueRangeProviderRefs = {"isFinished"})
+    //@PlanningVariable(valueRangeProviderRefs = {"isFinished"})
     private Boolean isFinished = false;
 
     public Task(){
