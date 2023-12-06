@@ -20,7 +20,7 @@ public class Recipe {
     private List<Character> characters;
 
     @ValueRangeProvider
-    @ProblemFactCollectionProperty
+    @PlanningEntityCollectionProperty
     private List<Task> tasks;
 
     @ValueRangeProvider

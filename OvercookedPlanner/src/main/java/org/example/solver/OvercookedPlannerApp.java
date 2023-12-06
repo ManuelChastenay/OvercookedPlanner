@@ -23,7 +23,7 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(Recipe.class)
                 .withEntityClasses(Task.class, TaskAssignment.class/*, CharacterOrTaskAssignment.class*/)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationSpentLimit(Duration.ofSeconds(10))
+                .withTerminationSpentLimit(Duration.ofSeconds(2))
                 //.withTerminationConfig(new TerminationConfig().withBestScoreLimit("-5hard/0soft"))
         );
 

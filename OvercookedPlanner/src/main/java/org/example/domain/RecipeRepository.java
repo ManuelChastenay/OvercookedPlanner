@@ -63,7 +63,7 @@ public class RecipeRepository {
         Task serveSoupTask = new Task("Serve soup", putSoupTask, false, true);
         taskList.add(serveSoupTask);
 
-        //TODO Remove, test purposes
+        //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin
         //taskList = taskList.reversed();
 
         onionSoup.setTasks(taskList);
