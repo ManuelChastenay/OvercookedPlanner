@@ -21,12 +21,12 @@ public class Task{
 
     private Recipe currentRecipe;
 
-    @PlanningVariable(valueRangeProviderRefs = {"taskRange"})
+    //@PlanningVariable(valueRangeProviderRefs = {"taskRange"})
     private Task dependentTask;
 
     //TODO Faire fonctionner les choix du solveur sur cette variable
-    //@PlanningVariable(valueRangeProviderRefs = {"isFinished"})
-    private Boolean isFinished = true;
+    @PlanningVariable(valueRangeProviderRefs = {"isFinished"})
+    private Boolean isFinished = false;
 
     public Task(){
     }
@@ -52,13 +52,13 @@ public class Task{
                 .collect(Collectors.toList());
     }
 
-    /*@ValueRangeProvider(id = "isFinished")
+    @ValueRangeProvider(id = "isFinished")
     public List<Boolean> getPossibleFinishedStates() {
         List<Boolean> booleans = new ArrayList<>();
         booleans.add(true);
         booleans.add(false);
         return booleans;
-    }*/
+    }
 
     public String getTaskName() {
         return taskName;

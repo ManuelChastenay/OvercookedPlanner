@@ -71,4 +71,12 @@ public class TaskAssignment extends CharacterOrTaskAssignment {
     public int getId(){
         return id;
     }
+
+    public CharacterOrTaskAssignment getPreviousTask() {
+        return previousTask;
+    }
+
+    public void setPreviousTask(CharacterOrTaskAssignment previousTask) {
+        this.previousTask = previousTask;
+    }
 }

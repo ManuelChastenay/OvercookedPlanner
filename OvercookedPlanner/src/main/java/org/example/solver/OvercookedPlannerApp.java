@@ -25,7 +25,7 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(Recipe.class)
                 .withEntityClasses(Task.class, TaskAssignment.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationSpentLimit(Duration.ofSeconds(15))
+                .withTerminationSpentLimit(Duration.ofSeconds(5))
                 //.withTerminationConfig(new TerminationConfig().withBestScoreLimit("-5hard/0soft"))
         );
 
@@ -58,10 +58,13 @@ public class OvercookedPlannerApp {
 
     private static void printPlan(Recipe recipe) {
         LOGGER.info("");
-        for (TaskAssignment task:
+        for (TaskAssignment taskAssignment:
                 recipe.getTaskAssignments()) {
-            LOGGER.info("Task: " + task.getTask().getTaskName());
-            LOGGER.info("Executed by character: " + task.getCharacter().getId());
+            if(taskAssignment.getPreviousTask() instanceof TaskAssignment){
+                LOGGER.info("Previous Task: " + ((TaskAssignment) taskAssignment.getPreviousTask()).getTask().getTaskName());
+            }
+            LOGGER.info("Task: " + taskAssignment.getTask().getTaskName());
+            LOGGER.info("Executed by character: " + taskAssignment.getCharacter().getId());
             LOGGER.info("");
         }
     }
