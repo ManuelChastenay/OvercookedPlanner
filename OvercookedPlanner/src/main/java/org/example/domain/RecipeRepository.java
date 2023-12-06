@@ -64,7 +64,8 @@ public class RecipeRepository {
         taskList.add(serveSoupTask);
 
         //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin
-        //taskList = taskList.reversed();
+        //Cette inversion a un impact majeur dans le temps de calcul, pour l'instant, avec 2 contraintes, on passe de 0.5sec à ~30 sec.
+        taskList = taskList.reversed();
 
         onionSoup.setTasks(taskList);
         repository.put(ONION_SOUP_RECIPE, onionSoup);

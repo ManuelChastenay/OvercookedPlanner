@@ -5,6 +5,9 @@ import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
+import org.optaplanner.core.api.domain.valuerange.CountableValueRange;
+import org.optaplanner.core.api.domain.valuerange.ValueRange;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
@@ -29,6 +32,12 @@ public class Recipe {
 
     @PlanningScore
     private HardSoftScore score;
+
+
+    @ValueRangeProvider(id = "finishedOrder")
+    public CountableValueRange<Integer> getFinishedOrder() {
+        return ValueRangeFactory.createIntValueRange(0, tasks.size());
+    }
 
     public Recipe() {
         taskAssignments = new ArrayList<>();
@@ -58,9 +67,12 @@ public class Recipe {
 
         int id = 0;
         for (Task task : tasks) {
-            System.out.println(task);
+            task.setId(id++);
             for (Character character : characters) {
-                taskAssignments.add(new TaskAssignment(id++, task, character));
+                //TODO Revoir le gestion des ids
+                TaskAssignment newTA = new TaskAssignment(id, task, character);
+                task.setTaskAssignment(newTA);
+                taskAssignments.add(newTA);
             }
         }
     }

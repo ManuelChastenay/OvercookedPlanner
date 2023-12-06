@@ -8,11 +8,13 @@ import org.example.domain.grid.Grid;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.optaplanner.core.config.solver.SolverConfig;
+import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class OvercookedPlannerApp {
@@ -23,8 +25,7 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(Recipe.class)
                 .withEntityClasses(Task.class, TaskAssignment.class/*, CharacterOrTaskAssignment.class*/)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationSpentLimit(Duration.ofSeconds(2))
-                //.withTerminationConfig(new TerminationConfig().withBestScoreLimit("-5hard/0soft"))
+                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft").withSecondsSpentLimit(60L))
         );
 
         // Load the problem
@@ -57,14 +58,14 @@ public class OvercookedPlannerApp {
 
     private static void printPlan(Recipe recipe) {
         LOGGER.info("");
-        for (TaskAssignment taskAssignment:
-                recipe.getTaskAssignments()) {
-            /*if(taskAssignment.getPreviousTask() instanceof TaskAssignment){
-                LOGGER.info("Previous Task: " + ((TaskAssignment) taskAssignment.getPreviousTask()).getTask().getTaskName());
-            }*/
+        recipe.getTaskAssignments().sort(Comparator.comparing(ta -> ta.getTask().getFinishedOrder()));
+        for (TaskAssignment taskAssignment: recipe.getTaskAssignments())
+        {
             LOGGER.info("Task: " + taskAssignment.getTask().getTaskName());
-            LOGGER.info("Task finished: " + taskAssignment.getTask().isFinished());
-            LOGGER.info("Executed by character: " + taskAssignment.getCharacter().getId());
+            //Implémenter avec les poids des tâches
+            //LOGGER.info("Task finished: " + taskAssignment.getTask().isFinished());
+            LOGGER.info("Task order: " + taskAssignment.getTask().getFinishedOrder());
+            //LOGGER.info("Executed by character: " + taskAssignment.getCharacter().getId());
             LOGGER.info("");
         }
     }
