@@ -23,6 +23,7 @@ public class Recipe {
     @ProblemFactCollectionProperty
     private List<Task> tasks;
 
+    @ValueRangeProvider
     @PlanningEntityCollectionProperty
     private List<TaskAssignment> taskAssignments;
 

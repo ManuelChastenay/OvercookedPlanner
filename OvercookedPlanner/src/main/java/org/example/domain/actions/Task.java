@@ -1,32 +1,26 @@
 package org.example.domain.actions;
 
 import org.example.domain.Recipe;
-import org.example.domain.TaskAssignment;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.valuerange.ValueRange;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
-import org.optaplanner.core.api.score.director.ScoreDirector;
-import org.optaplanner.core.impl.heuristic.move.AbstractMove;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @PlanningEntity
 public class Task{
     private String taskName;
-    private boolean incomingItem; //True si la tâche fais passer le character de main vides à main pleines, false sinon.
-    private boolean outcomingItem; //True si la tâche fais passer le character de main pleines à main vides, false sinon.
-
     private Recipe currentRecipe;
-
-    @PlanningVariable(valueRangeProviderRefs = {"taskRange"})
     private Task dependentTask;
 
-    //TODO Faire fonctionner les choix du solveur sur cette variable
-    //@PlanningVariable(valueRangeProviderRefs = {"isFinished"})
-    private Boolean isFinished = false;
+    private Boolean incomingItem; //True si la tâche fais passer le character de main vides à main pleines, false sinon.
+    private Boolean outcomingItem; //True si la tâche fais passer le character de main pleines à main vides, false sinon.
+
+    @PlanningVariable(valueRangeProviderRefs = {"finishedRange"})
+    private Boolean isFinished;
 
     public Task(){
     }
@@ -44,28 +38,13 @@ public class Task{
         this.outcomingItem = outcomingItem;
     }
 
-    @ValueRangeProvider(id = "taskRange")
-    public List<Task> getPossibleTaskList() {
-        // get all tasks in the recipe that are not the current task
-        return currentRecipe.getTasks().stream()
-                .filter(task -> task != this)
-                .collect(Collectors.toList());
-    }
-
-    @ValueRangeProvider(id = "isFinished")
-    public List<Boolean> getPossibleFinishedStates() {
-        List<Boolean> booleans = new ArrayList<>();
-        booleans.add(true);
-        booleans.add(false);
-        return booleans;
+    @ValueRangeProvider(id = "finishedRange")
+    public ValueRange<Boolean> getFinishedRange() {
+        return ValueRangeFactory.createBooleanValueRange();
     }
 
     public String getTaskName() {
         return taskName;
-    }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
     }
 
     public Recipe getCurrentRecipe() {
@@ -76,20 +55,23 @@ public class Task{
         this.currentRecipe = currentRecipe;
     }
 
-    public Task getDependentTask() {
-        return dependentTask;
+    public List<Task> getDependencies() {
+        if(dependentTask == null) return null;
+
+        List<Task> dependencies = new ArrayList<>();
+        dependencies.add(dependentTask);
+        return dependencies;
     }
 
-    public void setDependentTask(Task dependentTask) {
-        this.dependentTask = dependentTask;
+    public Boolean areDependenciesFinished(){
+        if(dependentTask == null) return true;
+        if(isFinished == null) return false;
+        return dependentTask.isFinished();
     }
 
-    public boolean isFinished(){
+    public Boolean isFinished(){
+        if(isFinished == null) return false;
         return isFinished;
-    }
-
-    public void setFinished(boolean isFinished) {
-        this.isFinished = isFinished;
     }
 
     public boolean hasIncoming(){

@@ -6,6 +6,10 @@ public class Character extends CharacterOrTaskAssignment {
     private String id;
     private Task currentTask;
 
+    public Character() {
+
+    }
+
     public Character(String id) {
         this.id = id;
     }

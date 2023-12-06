@@ -15,7 +15,7 @@ public abstract class CharacterOrTaskAssignment {
 
     /**
      * Shadow variable: Is automatically set by the Solver and facilitates that all the elements in the chain, the
-     * Trolley and the TrolleyStep, can have a reference to the next element in that chain.
+     * Character and the TaskAssignment, can have a reference to the next element in that chain.
      */
     @InverseRelationShadowVariable(sourceVariableName = PREVIOUS_TASK)
     protected TaskAssignment nextStep;

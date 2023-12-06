@@ -1,6 +1,7 @@
 package org.example.constraints;
 
 import org.example.domain.TaskAssignment;
+import org.example.domain.actions.Task;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.stream.Constraint;
 import org.optaplanner.core.api.score.stream.ConstraintFactory;
@@ -12,20 +13,26 @@ public class RecipeConstraintProvider implements ConstraintProvider {
     public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
         return new Constraint[]{
                 //Hard constraints
-                taskDependency(constraintFactory),
+                penalizeUnfinishedDependenciesTaskAssignment(constraintFactory),
+                //penalizeUnfinishedDependenciesTask(constraintFactory),
                 //cantHoldMoreThanOneItem(constraintFactory),
-                //characterMultiTasking(constraintFactory)
 
                 //Soft constraints
                 //minimizeDistanceFromPreviousStep(constraintFactory),
         };
     }
 
-    private Constraint taskDependency(ConstraintFactory constraintFactory) {
+    private Constraint penalizeUnfinishedDependenciesTaskAssignment(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(TaskAssignment.class)
-                .filter(taskAssignment -> taskAssignment.getTask().getDependentTask() != null &&
-                        !taskAssignment.getTask().getDependentTask().isFinished())
+                .filter(taskAssignment -> !taskAssignment.getTask().isFinished())
+                .penalize(HardSoftScore.ONE_HARD).asConstraint("Task Dependency");
+    }
+
+    private Constraint penalizeUnfinishedDependenciesTask(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .filter(task -> task.getDependencies() == null && !task.areDependenciesFinished())
                 .penalize(HardSoftScore.ONE_HARD).asConstraint("Task Dependency");
     }
 
@@ -42,15 +49,6 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 )
                 .penalize(HardSoftScore.ONE_HARD).asConstraint("Holding More Than One Item");
     }
-
-    /*private Constraint characterMultiTasking(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEach(TaskAssignment.class)
-                .join(TaskAssignment.class,
-                        equal(TaskAssignment::getCharacter),
-                        lessThan(TaskAssignment::getEndTime, TaskAssignment::getStartTime))
-                .penalize("Character multitasking", HardSoftScore.ONE_HARD);
-    }*/
 
     Constraint minimizeDistanceFromPreviousStep(ConstraintFactory constraintFactory) {
         // TODO remove dumb constraint

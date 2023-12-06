@@ -2,7 +2,6 @@ package org.example.domain;
 
 import org.example.domain.actions.Task;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
@@ -28,7 +27,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 @PlanningEntity
 public class TaskAssignment extends CharacterOrTaskAssignment {
     //TODO: Change to startTime
-    @PlanningId
+    //@PlanningId
     private int id;
 
     private Task task;
