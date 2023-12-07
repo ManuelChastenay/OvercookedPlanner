@@ -46,6 +46,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .forEach(Character.class)
                 .filter(character -> character.getNextElement() == null)
                 .penalize(HardSoftLongScore.ONE_SOFT).asConstraint("All characters must work");
+    }
 
     //TODO: Accélérer en joinant seulement les tâches à leurs dépendences
     /*private Constraint penalizeDependenciesOrderTaskEquality(ConstraintFactory constraintFactory) {

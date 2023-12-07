@@ -2,7 +2,6 @@ package org.example.domain.actions;
 
 import org.example.domain.Character;
 import org.example.domain.Recipe;
-import org.example.domain.TaskAssignment;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -116,8 +115,8 @@ public class Task extends TaskOrCharacter {
         return dependencies;
     }
 
-    public Integer getFinishedOrder(){
-        return finishedOrder == null ? 0 : finishedOrder;
+    public Integer getStartTime(){
+        return startTime == null ? 0 : startTime;
     }
 
     public boolean hasIncoming(){

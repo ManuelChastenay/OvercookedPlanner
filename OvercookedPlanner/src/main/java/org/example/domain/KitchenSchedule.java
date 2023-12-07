@@ -5,6 +5,8 @@ import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
+import org.optaplanner.core.api.domain.valuerange.CountableValueRange;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
@@ -21,6 +23,11 @@ public class KitchenSchedule {
     @ValueRangeProvider
     @PlanningEntityCollectionProperty
     private List<Task> taskList;
+
+    @ValueRangeProvider(id = "startTime")
+    public CountableValueRange<Integer> getFinishedOrder() {
+        return ValueRangeFactory.createIntValueRange(0, taskList.size());
+    }
 
     @PlanningScore
     private HardSoftLongScore score;

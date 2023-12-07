@@ -13,9 +13,7 @@ import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class OvercookedPlannerApp {
@@ -75,7 +73,7 @@ public class OvercookedPlannerApp {
             Task task = character.getNextElement();
             while(task != null) {
                 LOGGER.info(task.getName() + (task.isHandEmpty() ? "" : " ✋"));
-                LOGGER.info("Task order: " + taskAssignment.getTask().getFinishedOrder());
+                LOGGER.info("Task order: " + task.getStartTime());
                 task = task.getNextElement();
             }
         }
