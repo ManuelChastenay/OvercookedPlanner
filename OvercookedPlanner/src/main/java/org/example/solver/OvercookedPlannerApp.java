@@ -25,8 +25,8 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(KitchenSchedule.class)
                 .withEntityClasses(Task.class, TaskOrCharacter.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationSpentLimit(Duration.ofSeconds(5))
-                //.withTerminationConfig(new TerminationConfig().withBestScoreLimit("-2hard/0soft"))
+                //.withTerminationSpentLimit(Duration.ofSeconds(5))
+                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft"))
         );
 
         // Load the problem
@@ -73,7 +73,7 @@ public class OvercookedPlannerApp {
             LOGGER.info(("Character " + character.getId()));
             Task task = character.getNextElement();
             while(task != null) {
-                LOGGER.info(task.getName());
+                LOGGER.info(task.getName() + (task.isHandEmpty() ? "" : " ✋"));
                 task = task.getNextElement();
             }
         }

@@ -14,6 +14,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         return new Constraint[]{
                 //Hard constraints
                 penalizeUnfinishedTaskRequirements(constraintFactory),
+                //cantHoldMoreThanOneItem(constraintFactory),
 
                 //Soft constraints
                 penalizeChracterDoingNothing(constraintFactory)
@@ -51,16 +52,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
     private Constraint cantHoldMoreThanOneItem(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
-                /*.join(Task.class,
-                        Joiners.equal(t -> t.getTaskAssignment().getCharacter()),
-                        Joiners.lessThan(Task::getId))
-                .filter((t1, t2) ->
-                                t1.hasIncoming() &&
-                                        !t1.hasOutcoming() &&
-                                        t2.hasIncoming()
-                        //taskAssignment1.getTask().getDependencies() != null &&
-                        //!taskAssignment1.getTask().getDependencies().contains(taskAssignment2.getTask())
-                )*/
-                .penalize(HardSoftScore.ONE_HARD).asConstraint("Holding More Than One Item");
+                .filter(task -> !task.isItemInHandValid())
+                .penalize(HardSoftLongScore.ONE_HARD).asConstraint("Holding More Than One Item");
     }
 }

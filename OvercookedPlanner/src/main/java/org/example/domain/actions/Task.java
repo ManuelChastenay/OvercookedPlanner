@@ -62,6 +62,13 @@ public class Task extends TaskOrCharacter {
         return previousElement;
     }
 
+    public Task getPreviousTask() {
+        if(getPreviousElement() instanceof Task) {
+            return (Task) getPreviousElement();
+        }
+        return null;
+    }
+
     public void setPreviousElement(TaskOrCharacter previousElement) {
         this.previousElement = previousElement;
     }
@@ -112,5 +119,24 @@ public class Task extends TaskOrCharacter {
             task = task.getNextElement();
         }
         return dependenciesToValidate.isEmpty();
+    }
+
+    public Boolean isHandEmpty(){
+        // Action prend objet
+        if(incomingItem) return false;
+        // Action prend pas objet, mais action précédente oui
+        if(getPreviousTask() != null && !getPreviousTask().isHandEmpty() && !outcomingItem) return false;
+
+        return true;
+    }
+
+    public Boolean isItemInHandValid(){
+        if(getPreviousTask() == null) {
+            return !outcomingItem;
+        }
+        if(getPreviousTask().isHandEmpty()) {
+            return !outcomingItem;
+        }
+        return !incomingItem;
     }
 }
