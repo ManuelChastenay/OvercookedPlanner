@@ -2,6 +2,7 @@ package org.example.domain.actions;
 
 import org.example.domain.Character;
 import org.example.domain.Recipe;
+import org.example.domain.TaskAssignment;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -13,6 +14,7 @@ import java.util.List;
 @PlanningEntity
 public class Task extends TaskOrCharacter {
     private String name;
+    private int id;
     private Recipe currentRecipe;
     private List<Task> dependentTasks;
 
@@ -25,8 +27,13 @@ public class Task extends TaskOrCharacter {
     private Boolean incomingItem; //True si la tâche fais passer le character de main vides à main pleines, false sinon.
     private Boolean outcomingItem; //True si la tâche fais passer le character de main pleines à main vides, false sinon.
 
-    public Task() {
-        //marshaling constructor.
+    //ValueRangeProvider se trouve dans la classe Recipe, pour avoir accès au nombre de tasks.
+    //TODO: Modifier lors de l'implémentation du temps pour l'ordonnancement
+    @PlanningVariable(valueRangeProviderRefs = {"startTime"})
+    private Integer startTime;
+
+    public Task(){
+
     }
 
     public Task(String name, boolean incomingItem, boolean outcomingItem) {
@@ -85,6 +92,14 @@ public class Task extends TaskOrCharacter {
         return nextElement == null;
     }
 
+    public void setId(int id){
+        this.id = id;
+    }
+
+    public int getId(){
+        return id;
+    }
+
     public Recipe getCurrentRecipe() {
         return currentRecipe;
     }
@@ -99,6 +114,10 @@ public class Task extends TaskOrCharacter {
             dependencies = new ArrayList<>();
         }
         return dependencies;
+    }
+
+    public Integer getFinishedOrder(){
+        return finishedOrder == null ? 0 : finishedOrder;
     }
 
     public boolean hasIncoming(){

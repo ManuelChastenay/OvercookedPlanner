@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class OvercookedPlannerApp {
@@ -25,8 +26,7 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(KitchenSchedule.class)
                 .withEntityClasses(Task.class, TaskOrCharacter.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                //.withTerminationSpentLimit(Duration.ofSeconds(5))
-                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft"))
+                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft").withSecondsSpentLimit(60L))
         );
 
         // Load the problem
@@ -69,11 +69,13 @@ public class OvercookedPlannerApp {
 
     private static void printPlan(KitchenSchedule solution) {
         for (Character character : solution.getCharacterList()) {
+            // recipe.getTaskAssignments().sort(Comparator.comparing(ta -> ta.getTask().getFinishedOrder()));
             LOGGER.info("");
             LOGGER.info(("Character " + character.getId()));
             Task task = character.getNextElement();
             while(task != null) {
                 LOGGER.info(task.getName() + (task.isHandEmpty() ? "" : " ✋"));
+                LOGGER.info("Task order: " + taskAssignment.getTask().getFinishedOrder());
                 task = task.getNextElement();
             }
         }

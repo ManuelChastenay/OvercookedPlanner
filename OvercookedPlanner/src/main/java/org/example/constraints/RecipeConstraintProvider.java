@@ -8,6 +8,8 @@ import org.optaplanner.core.api.score.stream.Constraint;
 import org.optaplanner.core.api.score.stream.ConstraintFactory;
 import org.optaplanner.core.api.score.stream.ConstraintProvider;
 
+import java.util.Objects;
+
 public class RecipeConstraintProvider implements ConstraintProvider {
     @Override
     public Constraint[] defineConstraints(ConstraintFactory constraintFactory) {
@@ -43,10 +45,29 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         return constraintFactory
                 .forEach(Character.class)
                 .filter(character -> character.getNextElement() == null)
-                //.filter(s -> s.getPreviousTask() == null)
-                //.reward(HardSoftScore.ONE_SOFT).asConstraint("Minimize Ste amount");
                 .penalize(HardSoftLongScore.ONE_SOFT).asConstraint("All characters must work");
+
+    //TODO: Accélérer en joinant seulement les tâches à leurs dépendences
+    /*private Constraint penalizeDependenciesOrderTaskEquality(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .join(Task.class,
+                        Joiners.equal(t -> t.getTaskAssignment().getCharacter()),
+                        Joiners.lessThan(Task::getId),
+                        Joiners.equal(Task::getFinishedOrder))
+                .penalize(HardSoftScore.ONE_HARD).asConstraint("All Different Task Order");
     }
+
+    private Constraint penalizeDependenciesOrderTaskDependency(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .join(Task.class,
+                        Joiners.equal(t -> t.getTaskAssignment().getCharacter()),
+                        Joiners.lessThan(Task::getId))
+                //In this case, t2.id < t1.id
+                .filter((t1, t2) -> t1.getDependencies() != null && t1.getDependencies().contains(t2) && t1.getFinishedOrder() < t2.getFinishedOrder())
+                .penalize(HardSoftScore.ONE_HARD).asConstraint("Dependencies Have Lower Task Order");
+    }*/
 
     //TODO: Corriger la contrainte, elle n'est pas complètement fonctionnelle.
     private Constraint cantHoldMoreThanOneItem(ConstraintFactory constraintFactory) {
