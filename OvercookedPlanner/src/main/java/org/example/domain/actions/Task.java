@@ -129,14 +129,39 @@ public class Task extends TaskOrCharacter {
 
     public Boolean areDependenciesFinished(){
         if(dependentTasks == null) return true;
-        List<Task> dependenciesToValidate = new ArrayList<>(getDependencies());
+        //List<Task> dependenciesToValidate = new ArrayList<>(getDependencies());
         //TODO inverser la recherche pour partir du task courant et redescendre
-        Task task = getCharacter().getNextElement();
+        /*Task task = getCharacter().getNextElement();
         while(task != null && task != this && !dependenciesToValidate.isEmpty()) {
             dependenciesToValidate.remove(task);
             task = task.getNextElement();
-        }
+        }*/
+        /*Task task = getPreviousTask();
+        while(task != null && !dependenciesToValidate.isEmpty()) {
+            dependenciesToValidate.remove(task);
+            task = task.getPreviousTask();
+        }*/
+        for (Task task : getDependencies())
         return dependenciesToValidate.isEmpty();
+    }
+
+    private boolean isTaskInList(Task current, Task target) {
+        if (current == null) return false;
+        if (current == target) return true;
+        return isTaskInList(current.getPreviousTask(), target);
+    }
+
+    public List<Task> getUnfinishedDependencies() {
+        if(dependentTasks != null) {
+            List<Task> dependenciesToValidate = new ArrayList<>(getDependencies());
+            Task task = getPreviousTask();
+            while(task != null && !dependenciesToValidate.isEmpty()) {
+                dependenciesToValidate.remove(task);
+                task = task.getPreviousTask();
+            }
+            return dependenciesToValidate;
+        }
+        return new ArrayList<>();
     }
 
     public Boolean isHandEmpty(){
