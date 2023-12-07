@@ -7,55 +7,54 @@ import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @PlanningSolution
 public class KitchenSchedule {
-
-    @PlanningEntityCollectionProperty
-    private List<CharacterSchedule> schedules = new ArrayList<>();
-
-    @ProblemFactCollectionProperty
     @ValueRangeProvider
+    @ProblemFactCollectionProperty
+    private List<Character> characterList;
+
+    @ValueRangeProvider
+    @PlanningEntityCollectionProperty
     private List<Task> taskList;
 
-
-    /*@ProblemFactCollectionProperty
-    @ValueRangeProvider
-    private List<Timeslot> timeslotList;
-    @ProblemFactCollectionProperty
-    @ValueRangeProvider
-    private List<Room> roomList;
-    @PlanningEntityCollectionProperty
-    private List<Lesson> lessonList;*/
-
     @PlanningScore
-    private HardSoftScore score;
+    private HardSoftLongScore score;
 
-    // No-arg constructor required for OptaPlanner
     public KitchenSchedule() {
+        // Marshalling constructor
     }
 
-    public KitchenSchedule(List<Character> characters, List<Task> tasks) {
-        long id = 0;
-        for (Character character : characters) {
-            schedules.add(new CharacterSchedule(id, character));
-            id++;
-        }
-        this.taskList = tasks;
+    public KitchenSchedule(List<Character> characterList, List<Task> taskList) {
+        this.characterList = characterList;
+        this.taskList = taskList;
     }
 
-    // ************************************************************************
-    // Getters and setters
-    // ************************************************************************
-
-    public List<CharacterSchedule> getCharacterScheduleList() {
-        return schedules;
+    public List<Character> getCharacterList() {
+        return characterList;
     }
 
-    public HardSoftScore getScore() {
+    public void setCharacterList(List<Character> characterList) {
+        this.characterList = characterList;
+    }
+
+    public List<Task> getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(List<Task> taskList) {
+        this.taskList = taskList;
+    }
+
+    public HardSoftLongScore getScore() {
         return score;
+    }
+
+    public void setScore(HardSoftLongScore score) {
+        this.score = score;
     }
 }

@@ -15,27 +15,13 @@ import java.util.List;
 public class Recipe {
     private String recipeName;
 
-    /*@ValueRangeProvider
-    @ProblemFactCollectionProperty
-    private List<Character> characters;*/
-
-    //@ValueRangeProvider
-    //@PlanningEntityCollectionProperty
     private List<Task> tasks = new ArrayList<>();
 
-    /*@ValueRangeProvider
-    @PlanningEntityCollectionProperty
-    private List<TaskAssignment> taskAssignments;*/
-
-    /*@PlanningScore
-    private HardSoftScore score;*/
 
     public Recipe() {
-        //taskAssignments = new ArrayList<>();
     }
     public Recipe(String recipeName) {
         this.recipeName = recipeName;
-        //taskAssignments = new ArrayList<>();
     }
 
     public List<Task> getTasks() {
@@ -48,24 +34,4 @@ public class Recipe {
             task.setCurrentRecipe(this);
         }
     }
-
-    /*public List<Character> getCharacters() {
-        return characters;
-    }*/
-
-    /*public void setCharactersAndTaskAssignments(List<Character> characters) {
-        this.characters = characters;
-
-        int id = 0;
-        for (Task task : tasks) {
-            System.out.println(task);
-            for (Character character : characters) {
-                taskAssignments.add(new TaskAssignment(id++, task, character));
-            }
-        }
-    }*/
-
-    /*public List<TaskAssignment> getTaskAssignments() {
-        return taskAssignments;
-    }*/
 }

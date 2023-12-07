@@ -1,8 +1,9 @@
 package org.example.constraints;
 
-import org.example.domain.CharacterSchedule;
+import org.example.domain.Character;
 import org.example.domain.actions.Task;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.stream.Constraint;
 import org.optaplanner.core.api.score.stream.ConstraintFactory;
 import org.optaplanner.core.api.score.stream.ConstraintProvider;
@@ -15,23 +16,51 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 penalizeUnfinishedTaskRequirements(constraintFactory),
 
                 //Soft constraints
-                minimizeTotalAmountOfTask(constraintFactory),
+                penalizeChracterDoingNothing(constraintFactory)
         };
     }
 
     private Constraint penalizeUnfinishedTaskRequirements(ConstraintFactory constraintFactory) {
         return constraintFactory
-                //.forEach(Task.class)
-                .forEach(CharacterSchedule.class)
-                .filter(schedule -> !schedule.stepsRequirementsSatisfied())
-                .penalize(HardSoftScore.ONE_HARD).asConstraint("Step requirements");
+                .forEach(Task.class)
+                .filter(task -> !task.areDependenciesFinished())
+                //.forEach(CharacterSchedule.class)
+                //.filter(schedule -> !schedule.stepsRequirementsSatisfied())
+                .penalize(HardSoftLongScore.ONE_HARD).asConstraint("Task dependencies required");
     }
 
+    //TODO: Minimiser le temps total (Non fonctionnel)
     private Constraint minimizeTotalAmountOfTask(ConstraintFactory constraintFactory) {
         return constraintFactory
-                .forEachUniquePair(CharacterSchedule.class)
+                .forEachUniquePair(Character.class)
                 //.forEach(CharacterSchedule.class)
                 //.filter(s -> s.getTaskAmount() == 0)
-                .penalize(HardSoftScore.ONE_SOFT, (schedule1, schedule2) -> Math.abs(schedule1.getTaskAmount() - schedule2.getTaskAmount())).asConstraint("Minimize Step amount");
+                .penalize(HardSoftScore.ONE_SOFT/*, (schedule1, schedule2) -> Math.abs(schedule1.getTaskAmount() - schedule2.getTaskAmount())*/).asConstraint("Minimize Step amount");
+    }
+
+    private Constraint penalizeChracterDoingNothing(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Character.class)
+                .filter(character -> character.getNextElement() == null)
+                //.filter(s -> s.getPreviousTask() == null)
+                //.reward(HardSoftScore.ONE_SOFT).asConstraint("Minimize Ste amount");
+                .penalize(HardSoftLongScore.ONE_SOFT).asConstraint("All characters must work");
+    }
+
+    //TODO: Corriger la contrainte, elle n'est pas complètement fonctionnelle.
+    private Constraint cantHoldMoreThanOneItem(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                /*.join(Task.class,
+                        Joiners.equal(t -> t.getTaskAssignment().getCharacter()),
+                        Joiners.lessThan(Task::getId))
+                .filter((t1, t2) ->
+                                t1.hasIncoming() &&
+                                        !t1.hasOutcoming() &&
+                                        t2.hasIncoming()
+                        //taskAssignment1.getTask().getDependencies() != null &&
+                        //!taskAssignment1.getTask().getDependencies().contains(taskAssignment2.getTask())
+                )*/
+                .penalize(HardSoftScore.ONE_HARD).asConstraint("Holding More Than One Item");
     }
 }

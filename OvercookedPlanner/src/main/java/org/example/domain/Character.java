@@ -1,14 +1,14 @@
 package org.example.domain;
 
 import org.example.domain.actions.Task;
+import org.example.domain.actions.TaskOrCharacter;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 
-public class Character extends CharacterOrTaskAssignment {
+public class Character extends TaskOrCharacter {
     private String id;
-    //private Task currentTask;
 
     public Character() {
-
+        //marshalling constructor
     }
 
     public Character(String id) {
@@ -22,12 +22,4 @@ public class Character extends CharacterOrTaskAssignment {
     public void setId(String id) {
         this.id = id;
     }
-
-    /*public Task getCurrentTask() {
-        return currentTask;
-    }
-
-    public void setCurrentTask(Task currentTask) {
-        this.currentTask = currentTask;
-    }*/
 }

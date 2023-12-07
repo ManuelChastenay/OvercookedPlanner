@@ -1,7 +1,5 @@
 package org.example.domain;
 
-import org.example.domain.Recipe;
-import org.example.domain.actions.MultipleDependencyTask;
 import org.example.domain.actions.Task;
 
 import java.util.ArrayList;
@@ -35,8 +33,8 @@ public class RecipeRepository {
 
         Recipe onionSoup = new Recipe(ONION_SOUP_RECIPE);
 
-        Task takeOnionTask1 = new Task("Take onion1", null, true, false);
-        Task takeOnionTask2 = new Task("Take onion2", null, true, false);
+        Task takeOnionTask1 = new Task("Take onion1", true, false);
+        Task takeOnionTask2 = new Task("Take onion2", true, false);
         taskList.add(takeOnionTask1);
         taskList.add(takeOnionTask2);
 
@@ -54,14 +52,14 @@ public class RecipeRepository {
         List<Task> takeBowlDependencies = new ArrayList<>();
         takeBowlDependencies.add(placeOnionInPotTask1);
         takeBowlDependencies.add(placeOnionInPotTask2);
-        Task takeBowlTask = new MultipleDependencyTask("Take bowl", takeBowlDependencies, true, false);
-        //taskList.add(takeBowlTask);
+        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, true, false);
+        taskList.add(takeBowlTask);
 
         Task putSoupTask = new Task("Put soup in bowl", takeBowlTask, false, false);
-        //taskList.add(putSoupTask);
+        taskList.add(putSoupTask);
 
         Task serveSoupTask = new Task("Serve soup", putSoupTask, false, true);
-        //taskList.add(serveSoupTask);
+        taskList.add(serveSoupTask);
 
         //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin
         //taskList = taskList.reversed();
