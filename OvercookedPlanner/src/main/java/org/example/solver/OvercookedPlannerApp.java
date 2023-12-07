@@ -8,6 +8,7 @@ import org.example.domain.actions.TaskOrCharacter;
 import org.example.domain.grid.Grid;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.config.solver.EnvironmentMode;
 import org.optaplanner.core.config.solver.SolverConfig;
 import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.slf4j.Logger;
@@ -21,10 +22,11 @@ public class OvercookedPlannerApp {
 
     public static void plan(Grid grid) {
         SolverFactory<KitchenSchedule> solverFactory = SolverFactory.create(new SolverConfig()
+                .withEnvironmentMode(EnvironmentMode.FULL_ASSERT)
                 .withSolutionClass(KitchenSchedule.class)
                 .withEntityClasses(Task.class, TaskOrCharacter.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft").withSecondsSpentLimit(5L))
+                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft").withSecondsSpentLimit(30L))
         );
 
         // Load the problem
@@ -42,7 +44,7 @@ public class OvercookedPlannerApp {
     public static KitchenSchedule generateDemoData() {
         List<Character> characters = new ArrayList<>();
         characters.add(new Character("0"));
-        characters.add(new Character("1"));
+        //characters.add(new Character("1"));
 
         List<String> recipesToFetch = new ArrayList<>();
         recipesToFetch.add(RecipeRepository.ONION_SOUP_RECIPE);
@@ -51,8 +53,8 @@ public class OvercookedPlannerApp {
         List<Recipe> recipes = repository.getRecipes(recipesToFetch);
         List<Task> tasks = new ArrayList<>();
         recipes.forEach(recipe -> tasks.addAll(recipe.getTasks()));
-        tasks.add(new Task("dumb task 1", false, false));
-        //tasks.add(new Task("dumb task 2", null, false, false));
+        //tasks.add(new Task("dumb task 1", false, false));
+        //tasks.add(new Task("dumb task 2", tasks.getLast(), false, false));
         //tasks.add(new Task("dumb task 3", null, false, false));
         //tasks.add(new Task("dumb task 4", null, false, false));
         //tasks.add(new Task("dumb task 5", null, false, false));
@@ -67,13 +69,14 @@ public class OvercookedPlannerApp {
 
     private static void printPlan(KitchenSchedule solution) {
         for (Character character : solution.getCharacterList()) {
-            // recipe.getTaskAssignments().sort(Comparator.comparing(ta -> ta.getTask().getFinishedOrder()));
             LOGGER.info("");
             LOGGER.info(("Character " + character.getId()));
             Task task = character.getNextElement();
             while(task != null) {
                 LOGGER.info(task.getName() + (task.isHandEmpty() ? "" : " ✋"));
-                task.getUnfinishedDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
+                task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
+                LOGGER.info(String.valueOf(task.getStartTime()));
+                LOGGER.info(" ");
                 //LOGGER.info("Task order: " + task.getStartTime());
                 task = task.getNextElement();
             }

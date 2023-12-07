@@ -7,7 +7,7 @@
     </appender>
 
     <!-- Niveau de log durant la résolution -->
-    <logger name="org.optaplanner" level="warn"/>
+    <logger name="org.optaplanner" level="info"/>
 
     <!-- Niveau de log de la réponse -->
     <root level="info">

@@ -1,15 +1,6 @@
 package org.example.domain;
 
 import org.example.domain.actions.Task;
-import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
-import org.optaplanner.core.api.domain.solution.PlanningScore;
-import org.optaplanner.core.api.domain.solution.PlanningSolution;
-import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
-import org.optaplanner.core.api.domain.valuerange.CountableValueRange;
-import org.optaplanner.core.api.domain.valuerange.ValueRange;
-import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
-import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +22,10 @@ public class Recipe {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+        int id = 0;
         for (Task task : tasks) {
             task.setCurrentRecipe(this);
+            task.setId(id++);
         }
     }
 }

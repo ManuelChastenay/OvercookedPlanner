@@ -18,6 +18,8 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         return new Constraint[]{
                 //Hard constraints
                 penalizeUnfinishedTaskRequirements(constraintFactory),
+                //penalizeDependenciesOrderTaskEquality(constraintFactory),
+                //penalizeDependenciesOrderTaskDependency(constraintFactory),
                 //cantHoldMoreThanOneItem(constraintFactory),
 
                 //Soft constraints
@@ -25,13 +27,40 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         };
     }
 
+    //TODO: Accélérer en joinant seulement les tâches à leurs dépendences
+    private Constraint penalizeDependenciesOrderTaskEquality(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .join(Task.class,
+                        Joiners.equal(Task::getCharacter),
+                        Joiners.lessThan(Task::getId),
+                        Joiners.equal(Task::getStartTime))
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        (t1, t2) -> 1L).asConstraint("All Different Task Order");
+    }
+
+    private Constraint penalizeDependenciesOrderTaskDependency(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .join(Task.class,
+                        Joiners.equal(Task::getCharacter),
+                        Joiners.lessThan(Task::getId))
+                //In this case, t2.id < t1.id
+                .filter((t1, t2) -> t1.getDependencies() != null && t1.getDependencies().contains(t2) && t1.getStartTime() < t2.getStartTime())
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        (t1, t2) -> 1L).asConstraint("Dependencies Have Lower Task Order");
+    }
+
+    //TODO Le multijoueur va necessiter l'ordonnacement (Task::startTime)
     private Constraint penalizeUnfinishedTaskRequirements(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
-                .filter(task -> !task.getUnfinishedDependencies().isEmpty())
-                //.forEach(CharacterSchedule.class)
-                //.filter(schedule -> !schedule.stepsRequirementsSatisfied())
-                .penalize(HardSoftLongScore.ONE_HARD).asConstraint("Task dependencies required");
+                .join(Task.class)
+                .filter((t1, t2) -> t1.getDependencies().contains(t2) && !t1.getPreviousTasks().contains(t2))
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        (t1, t2) -> 1L).asConstraint("Task Dependencies Requires");
+                        //TODO Meilleure gestion des poids
+                        //(t1, t2) -> (long) t1.getUnfinishedDependencies().size()).asConstraint("Task Dependencies Requires");
     }
 
     //TODO: Minimiser le temps total (Non fonctionnel)
@@ -50,28 +79,6 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .penalize(HardSoftLongScore.ONE_SOFT).asConstraint("All characters must work");
     }
 
-    //TODO: Accélérer en joinant seulement les tâches à leurs dépendences
-    /*private Constraint penalizeDependenciesOrderTaskEquality(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEach(Task.class)
-                .join(Task.class,
-                        Joiners.equal(t -> t.getTaskAssignment().getCharacter()),
-                        Joiners.lessThan(Task::getId),
-                        Joiners.equal(Task::getFinishedOrder))
-                .penalize(HardSoftScore.ONE_HARD).asConstraint("All Different Task Order");
-    }
-
-    private Constraint penalizeDependenciesOrderTaskDependency(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEach(Task.class)
-                .join(Task.class,
-                        Joiners.equal(t -> t.getTaskAssignment().getCharacter()),
-                        Joiners.lessThan(Task::getId))
-                //In this case, t2.id < t1.id
-                .filter((t1, t2) -> t1.getDependencies() != null && t1.getDependencies().contains(t2) && t1.getFinishedOrder() < t2.getFinishedOrder())
-                .penalize(HardSoftScore.ONE_HARD).asConstraint("Dependencies Have Lower Task Order");
-    }*/
-
     /*private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
@@ -85,6 +92,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         return constraintFactory
                 .forEach(Task.class)
                 .filter(task -> !task.isItemInHandValid())
-                .penalize(HardSoftLongScore.ONE_HARD).asConstraint("Holding More Than One Item");
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        (t1) -> 1L).asConstraint("Holding More Than One Item");
     }
 }

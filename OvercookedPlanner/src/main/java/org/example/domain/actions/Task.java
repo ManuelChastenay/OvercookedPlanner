@@ -8,6 +8,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @PlanningEntity
@@ -60,10 +61,6 @@ public class Task extends TaskOrCharacter {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public TaskOrCharacter getPreviousElement() {
         return previousElement;
     }
@@ -75,20 +72,8 @@ public class Task extends TaskOrCharacter {
         return null;
     }
 
-    public void setPreviousElement(TaskOrCharacter previousElement) {
-        this.previousElement = previousElement;
-    }
-
     public Character getCharacter() {
         return character;
-    }
-
-    public void setCharacter(Character character) {
-        this.character = character;
-    }
-
-    public boolean isLast() {
-        return nextElement == null;
     }
 
     public void setId(int id){
@@ -97,10 +82,6 @@ public class Task extends TaskOrCharacter {
 
     public int getId(){
         return id;
-    }
-
-    public Recipe getCurrentRecipe() {
-        return currentRecipe;
     }
 
     public void setCurrentRecipe(Recipe currentRecipe) {
@@ -119,64 +100,18 @@ public class Task extends TaskOrCharacter {
         return startTime == null ? 0 : startTime;
     }
 
-    public boolean hasIncoming(){
-        return incomingItem;
-    }
+    //TODO Degueu mais fonctionnel
+    public List<Task> getPreviousTasks(){
+        List<Task> previousTasks = new ArrayList<>();
+        if(previousElement instanceof Character) return previousTasks;
 
-    public boolean hasOutcoming(){
-        return outcomingItem;
-    }
-
-    public Boolean areDependenciesFinished(){
-        //if(dependentTasks == null) return true;
-        //List<Task> dependenciesToValidate = new ArrayList<>(getDependencies());
-        //TODO inverser la recherche pour partir du task courant et redescendre
-        /*Task task = getCharacter().getNextElement();
-        while(task != null && task != this && !dependenciesToValidate.isEmpty()) {
-            dependenciesToValidate.remove(task);
-            task = task.getNextElement();
-        }*/
-        /*Task task = getPreviousTask();
-        while(task != null && !dependenciesToValidate.isEmpty()) {
-            dependenciesToValidate.remove(task);
-            task = task.getPreviousTask();
-        }*/
-        /*boolean good = true;
-        for (Task task : getDependencies()) {
-            if(!isTaskInList(getPreviousTask(), task)) good = false;
-            break;
+        Task previousTask = (Task) previousElement;
+        while(previousTask != null){
+            previousTasks.add(previousTask);
+            if(previousTask.previousElement instanceof Character) return previousTasks;
+            previousTask = (Task) previousTask.previousElement;
         }
-        return good;*/
-        //return dependenciesToValidate.isEmpty();
-        if(dependentTasks != null) {
-            List<Task> dependenciesToValidate = new ArrayList<>(getDependencies());
-            Task task = getPreviousTask();
-            while(task != null && !dependenciesToValidate.isEmpty()) {
-                dependenciesToValidate.remove(task);
-                task = task.getPreviousTask();
-            }
-            return dependenciesToValidate.isEmpty();
-        }
-        return new ArrayList<>().isEmpty();
-    }
-
-    private boolean isTaskInList(Task current, Task target) {
-        if (current == null) return false;
-        if (current == target) return true;
-        return isTaskInList(current.getPreviousTask(), target);
-    }
-
-    public List<Task> getUnfinishedDependencies() {
-        if(dependentTasks != null) {
-            List<Task> dependenciesToValidate = new ArrayList<>(getDependencies());
-            Task task = getPreviousTask();
-            while(task != null && !dependenciesToValidate.isEmpty()) {
-                dependenciesToValidate.remove(task);
-                task = task.getPreviousTask();
-            }
-            return dependenciesToValidate;
-        }
-        return new ArrayList<>();
+        return previousTasks;
     }
 
     public Boolean isHandEmpty(){

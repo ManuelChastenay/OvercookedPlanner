@@ -2,10 +2,7 @@ package org.example.domain;
 
 import org.example.domain.actions.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RecipeRepository {
     public static final String ONION_SOUP_RECIPE = "ONION_SOUP_RECIPE";
@@ -63,7 +60,8 @@ public class RecipeRepository {
 
         //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin
         //Cette inversion a un impact majeur dans le temps de calcul, pour l'instant, avec 2 contraintes, on passe de 0.5sec à ~30 sec.
-        taskList = taskList.reversed();
+        //taskList = taskList.reversed();
+        Collections.shuffle(taskList);
 
         onionSoup.setTasks(taskList);
         repository.put(ONION_SOUP_RECIPE, onionSoup);
