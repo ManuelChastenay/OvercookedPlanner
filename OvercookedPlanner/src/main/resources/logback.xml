@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5p : %m %n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Niveau de log durant la résolution -->
+    <logger name="org.optaplanner" level="warn"/>
+
+    <!-- Niveau de log de la réponse -->
+    <root level="info">
+        <appender-ref ref="consoleAppender" />
+    </root>
+</configuration>
