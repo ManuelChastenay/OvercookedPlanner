@@ -11,7 +11,6 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import java.util.ArrayList;
 import java.util.List;
 
-//@PlanningSolution
 public class Recipe {
     private String recipeName;
 
