@@ -19,8 +19,8 @@ public class Task{
     private Boolean incomingItem; //True si la tâche fais passer le character de main vides à main pleines, false sinon.
     private Boolean outcomingItem; //True si la tâche fais passer le character de main pleines à main vides, false sinon.
 
-    @PlanningVariable(valueRangeProviderRefs = {"finishedRange"})
-    private Boolean isFinished;
+    //@PlanningVariable(valueRangeProviderRefs = {"finishedRange"})
+    //private Boolean isFinished;
 
     public Task(){
     }
@@ -38,10 +38,10 @@ public class Task{
         this.outcomingItem = outcomingItem;
     }
 
-    @ValueRangeProvider(id = "finishedRange")
+    /*@ValueRangeProvider(id = "finishedRange")
     public ValueRange<Boolean> getFinishedRange() {
         return ValueRangeFactory.createBooleanValueRange();
-    }
+    }*/
 
     public String getTaskName() {
         return taskName;
@@ -56,23 +56,25 @@ public class Task{
     }
 
     public List<Task> getDependencies() {
-        if(dependentTask == null) return null;
+        //if(dependentTask == null) return null;
 
         List<Task> dependencies = new ArrayList<>();
-        dependencies.add(dependentTask);
+        if(dependentTask != null) {
+            dependencies.add(dependentTask);
+        }
         return dependencies;
     }
 
-    public Boolean areDependenciesFinished(){
+    /*public Boolean areDependenciesFinished(){
         if(dependentTask == null) return true;
         if(isFinished == null) return false;
         return dependentTask.isFinished();
-    }
+    }*/
 
-    public Boolean isFinished(){
+    /*public Boolean isFinished(){
         if(isFinished == null) return false;
         return isFinished;
-    }
+    }*/
 
     public boolean hasIncoming(){
         return incomingItem;

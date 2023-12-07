@@ -55,13 +55,13 @@ public class RecipeRepository {
         takeBowlDependencies.add(placeOnionInPotTask1);
         takeBowlDependencies.add(placeOnionInPotTask2);
         Task takeBowlTask = new MultipleDependencyTask("Take bowl", takeBowlDependencies, true, false);
-        taskList.add(takeBowlTask);
+        //taskList.add(takeBowlTask);
 
         Task putSoupTask = new Task("Put soup in bowl", takeBowlTask, false, false);
-        taskList.add(putSoupTask);
+        //taskList.add(putSoupTask);
 
         Task serveSoupTask = new Task("Serve soup", putSoupTask, false, true);
-        taskList.add(serveSoupTask);
+        //taskList.add(serveSoupTask);
 
         //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin
         //taskList = taskList.reversed();

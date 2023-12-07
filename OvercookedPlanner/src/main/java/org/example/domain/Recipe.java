@@ -15,27 +15,27 @@ import java.util.List;
 public class Recipe {
     private String recipeName;
 
-    @ValueRangeProvider
+    /*@ValueRangeProvider
     @ProblemFactCollectionProperty
-    private List<Character> characters;
+    private List<Character> characters;*/
 
-    @ValueRangeProvider
+    //@ValueRangeProvider
+    //@PlanningEntityCollectionProperty
+    private List<Task> tasks = new ArrayList<>();
+
+    /*@ValueRangeProvider
     @PlanningEntityCollectionProperty
-    private List<Task> tasks;
+    private List<TaskAssignment> taskAssignments;*/
 
-    @ValueRangeProvider
-    @PlanningEntityCollectionProperty
-    private List<TaskAssignment> taskAssignments;
-
-    @PlanningScore
-    private HardSoftScore score;
+    /*@PlanningScore
+    private HardSoftScore score;*/
 
     public Recipe() {
-        taskAssignments = new ArrayList<>();
+        //taskAssignments = new ArrayList<>();
     }
     public Recipe(String recipeName) {
         this.recipeName = recipeName;
-        taskAssignments = new ArrayList<>();
+        //taskAssignments = new ArrayList<>();
     }
 
     public List<Task> getTasks() {
@@ -49,11 +49,11 @@ public class Recipe {
         }
     }
 
-    public List<Character> getCharacters() {
+    /*public List<Character> getCharacters() {
         return characters;
-    }
+    }*/
 
-    public void setCharactersAndTaskAssignments(List<Character> characters) {
+    /*public void setCharactersAndTaskAssignments(List<Character> characters) {
         this.characters = characters;
 
         int id = 0;
@@ -63,9 +63,9 @@ public class Recipe {
                 taskAssignments.add(new TaskAssignment(id++, task, character));
             }
         }
-    }
+    }*/
 
-    public List<TaskAssignment> getTaskAssignments() {
+    /*public List<TaskAssignment> getTaskAssignments() {
         return taskAssignments;
-    }
+    }*/
 }

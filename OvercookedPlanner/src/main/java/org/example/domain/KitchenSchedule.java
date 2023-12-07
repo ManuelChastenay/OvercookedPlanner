@@ -1,5 +1,6 @@
 package org.example.domain;
 
+import org.example.domain.actions.Task;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
@@ -18,7 +19,7 @@ public class KitchenSchedule {
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider
-    private List<Step> stepList;
+    private List<Task> taskList;
 
 
     /*@ProblemFactCollectionProperty
@@ -37,13 +38,13 @@ public class KitchenSchedule {
     public KitchenSchedule() {
     }
 
-    public KitchenSchedule(List<Character> characters, List<Step> steps) {
+    public KitchenSchedule(List<Character> characters, List<Task> tasks) {
         long id = 0;
         for (Character character : characters) {
             schedules.add(new CharacterSchedule(id, character));
             id++;
         }
-        this.stepList = steps;
+        this.taskList = tasks;
     }
 
     // ************************************************************************

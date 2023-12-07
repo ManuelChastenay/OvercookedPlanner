@@ -18,10 +18,10 @@ public class MultipleDependencyTask extends Task {
         return dependentTasks;
     }
 
-    public Boolean areDependenciesFinished(){
+    /*public Boolean areDependenciesFinished(){
         for (Task dependentTask : dependentTasks) {
             if (!dependentTask.isFinished()) return false;
         }
         return true;
-    }
+    }*/
 }

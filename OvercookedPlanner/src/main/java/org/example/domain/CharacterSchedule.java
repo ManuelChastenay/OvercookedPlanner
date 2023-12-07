@@ -1,14 +1,12 @@
 package org.example.domain;
 
+import org.example.domain.actions.Task;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.lookup.PlanningId;
-import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.variable.PlanningListVariable;
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 @PlanningEntity
 public class CharacterSchedule {
@@ -18,7 +16,7 @@ public class CharacterSchedule {
     private Character character;
 
     @PlanningListVariable
-    private List<Step> steps = new ArrayList<>();
+    private List<Task> tasks = new ArrayList<>();
 
     public CharacterSchedule() {}
 
@@ -27,17 +25,17 @@ public class CharacterSchedule {
         this.character = character;
     }
 
-    public CharacterSchedule(long id, Character character, List<Step> steps) {
+    public CharacterSchedule(long id, Character character, List<Task> tasks) {
         this(id, character);
-        this.steps = steps;
+        this.tasks = tasks;
     }
 
     @Override
     public String toString() {
-        StringBuilder returnValue = new StringBuilder("Character : " + character.getId() + ", Steps : ");
-        for (Step step : steps) {
-            returnValue.append(step.getName());
-            if(step != steps.getLast()) {
+        StringBuilder returnValue = new StringBuilder("Character : " + character.getId() + ", Tasks : ");
+        for (Task task : tasks) {
+            returnValue.append(task.getTaskName());
+            if(task != tasks.getLast()) {
                 returnValue.append(", ");
             }
         }
@@ -45,15 +43,9 @@ public class CharacterSchedule {
     }
 
     public boolean stepsRequirementsSatisfied() {
-        for (Step step : steps) {
-            if (step.getName() == "Couper un onion") {
-                int onionsDispo = 0;
-                for(int i = 0; i < steps.indexOf(step); i++) {
-                    if(steps.get(i).getName() == "Prendre un onion") {
-                        onionsDispo++;
-                    }
-                }
-                if(onionsDispo <= 0) {
+        for (Task task : tasks) {
+            for (Task dependency : task.getDependencies()) {
+                if (!tasks.contains(dependency) || tasks.indexOf(dependency) > tasks.indexOf(task)) {
                     return false;
                 }
             }
@@ -72,14 +64,14 @@ public class CharacterSchedule {
         this.character = character;
     }
 
-    public List<Step> getSteps() {
-        return steps;
+    public List<Task> getTasks() {
+        return tasks;
     }
-    public void setSteps(List<Step> steps) {
-        this.steps = steps;
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 
-    public int getStepAmount() {
-        return steps.size();
+    public int getTaskAmount() {
+        return tasks.size();
     }
 }
