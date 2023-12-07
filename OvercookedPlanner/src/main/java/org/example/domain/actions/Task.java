@@ -128,7 +128,7 @@ public class Task extends TaskOrCharacter {
     }
 
     public Boolean areDependenciesFinished(){
-        if(dependentTasks == null) return true;
+        //if(dependentTasks == null) return true;
         //List<Task> dependenciesToValidate = new ArrayList<>(getDependencies());
         //TODO inverser la recherche pour partir du task courant et redescendre
         /*Task task = getCharacter().getNextElement();
@@ -141,8 +141,23 @@ public class Task extends TaskOrCharacter {
             dependenciesToValidate.remove(task);
             task = task.getPreviousTask();
         }*/
-        for (Task task : getDependencies())
-        return dependenciesToValidate.isEmpty();
+        /*boolean good = true;
+        for (Task task : getDependencies()) {
+            if(!isTaskInList(getPreviousTask(), task)) good = false;
+            break;
+        }
+        return good;*/
+        //return dependenciesToValidate.isEmpty();
+        if(dependentTasks != null) {
+            List<Task> dependenciesToValidate = new ArrayList<>(getDependencies());
+            Task task = getPreviousTask();
+            while(task != null && !dependenciesToValidate.isEmpty()) {
+                dependenciesToValidate.remove(task);
+                task = task.getPreviousTask();
+            }
+            return dependenciesToValidate.isEmpty();
+        }
+        return new ArrayList<>().isEmpty();
     }
 
     private boolean isTaskInList(Task current, Task target) {

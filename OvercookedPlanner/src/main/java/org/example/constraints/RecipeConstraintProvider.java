@@ -28,7 +28,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
     private Constraint penalizeUnfinishedTaskRequirements(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
-                .filter(task -> !task.areDependenciesFinished())
+                .filter(task -> !task.getUnfinishedDependencies().isEmpty())
                 //.forEach(CharacterSchedule.class)
                 //.filter(schedule -> !schedule.stepsRequirementsSatisfied())
                 .penalize(HardSoftLongScore.ONE_HARD).asConstraint("Task dependencies required");
