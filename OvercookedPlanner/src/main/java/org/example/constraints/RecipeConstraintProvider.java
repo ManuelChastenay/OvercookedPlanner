@@ -18,8 +18,12 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         return new Constraint[]{
                 //Hard constraints
                 penalizeUnfinishedTaskRequirements(constraintFactory),
-                //penalizeDependenciesOrderTaskEquality(constraintFactory),
-                //penalizeDependenciesOrderTaskDependency(constraintFactory),
+
+                //Manu: Vous pouvez commenter cette contrainte si vous ne travaillez pas sur le multijouer
+                //Adam, tu peux partir de ça pour les poids plus tard quand tu vas être rendu là (Sauvegarde des paths dans les characters)
+                //Avoir un eventlistener qui gère les valeurs de startTime serait mieux qu'avoir le solveur qui s'en occuppe.
+                penalizeDependenciesOrderTaskDependency(constraintFactory),
+
                 //cantHoldMoreThanOneItem(constraintFactory),
 
                 //Soft constraints
@@ -27,40 +31,33 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         };
     }
 
-    //TODO: Accélérer en joinant seulement les tâches à leurs dépendences
-    private Constraint penalizeDependenciesOrderTaskEquality(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEach(Task.class)
-                .join(Task.class,
-                        Joiners.equal(Task::getCharacter),
-                        Joiners.lessThan(Task::getId),
-                        Joiners.equal(Task::getStartTime))
-                .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1, t2) -> 1L).asConstraint("All Different Task Order");
-    }
-
-    private Constraint penalizeDependenciesOrderTaskDependency(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEach(Task.class)
-                .join(Task.class,
-                        Joiners.equal(Task::getCharacter),
-                        Joiners.lessThan(Task::getId))
-                //In this case, t2.id < t1.id
-                .filter((t1, t2) -> t1.getDependencies() != null && t1.getDependencies().contains(t2) && t1.getStartTime() < t2.getStartTime())
-                .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1, t2) -> 1L).asConstraint("Dependencies Have Lower Task Order");
-    }
-
     //TODO Le multijoueur va necessiter l'ordonnacement (Task::startTime)
     private Constraint penalizeUnfinishedTaskRequirements(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
-                .join(Task.class)
-                .filter((t1, t2) -> t1.getDependencies().contains(t2) && !t1.getPreviousTasks().contains(t2))
+                //Vérifier si le bris de symétrie est plus efficace sous forme de joiner ou de filter
+                .join(Task.class,
+                        Joiners.lessThan(Task::getId))
+                .filter(
+                        (t1, t2) -> (t2.getDependencies().contains(t1) && !t2.getPreviousTasks().contains(t1)) ||
+                                (t1.getDependencies().contains(t2) && !t1.getPreviousTasks().contains(t2))
+                )
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
                         (t1, t2) -> 1L).asConstraint("Task Dependencies Requires");
-                        //TODO Meilleure gestion des poids
-                        //(t1, t2) -> (long) t1.getUnfinishedDependencies().size()).asConstraint("Task Dependencies Requires");
+        //TODO Meilleure gestion des poids
+        //(t1, t2) -> (long) t1.getUnfinishedDependencies().size()).asConstraint("Task Dependencies Requires");
+    }
+
+    //TODO: Accélérer en joinant seulement les tâches à leurs dépendences
+    private Constraint penalizeDependenciesOrderTaskDependency(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .join(Task.class,
+                        Joiners.equal(Task::getCharacter))
+                .filter((t1, t2) -> t1.getPreviousTasks().contains(t2) && t1.getStartTime() <= t2.getStartTime())
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        //Manu: Je sais pas pourquoi, mais un gros poids accélère vraiment la convergence ici
+                        (t1, t2) -> 100L).asConstraint("Dependencies Have Lower Task Order");
     }
 
     //TODO: Minimiser le temps total (Non fonctionnel)
