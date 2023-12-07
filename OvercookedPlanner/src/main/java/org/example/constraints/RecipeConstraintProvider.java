@@ -2,11 +2,13 @@ package org.example.constraints;
 
 import org.example.domain.Character;
 import org.example.domain.actions.Task;
+import org.example.utils.Pathfinding;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.stream.Constraint;
 import org.optaplanner.core.api.score.stream.ConstraintFactory;
 import org.optaplanner.core.api.score.stream.ConstraintProvider;
+import org.optaplanner.core.api.score.stream.Joiners;
 
 import java.util.Objects;
 
@@ -68,6 +70,14 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 //In this case, t2.id < t1.id
                 .filter((t1, t2) -> t1.getDependencies() != null && t1.getDependencies().contains(t2) && t1.getFinishedOrder() < t2.getFinishedOrder())
                 .penalize(HardSoftScore.ONE_HARD).asConstraint("Dependencies Have Lower Task Order");
+    }*/
+
+    /*private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                //.filter(Task::isLast)
+                .penalizeLong(HardSoftLongScore.ONE_SOFT,
+                    task -> Pathfinding.calculateDistance(task.getLocation(), task.getCharacter().getLocation()));
     }*/
 
     //TODO: Corriger la contrainte, elle n'est pas complètement fonctionnelle.
