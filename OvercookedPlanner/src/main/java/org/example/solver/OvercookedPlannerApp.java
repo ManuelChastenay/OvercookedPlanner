@@ -48,6 +48,7 @@ public class OvercookedPlannerApp {
 
         List<String> recipesToFetch = new ArrayList<>();
         recipesToFetch.add(RecipeRepository.ONION_SOUP_RECIPE);
+        recipesToFetch.add(RecipeRepository.BROCOLI_SOUP_RECIPE);
 
         RecipeRepository repository = new RecipeRepository();
         List<Recipe> recipes = repository.getRecipes(recipesToFetch);

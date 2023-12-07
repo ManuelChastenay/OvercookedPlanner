@@ -7,13 +7,15 @@ import java.util.List;
 
 public class Recipe {
     private String recipeName;
+    private Integer recipeStartTime;
 
     private List<Task> tasks = new ArrayList<>();
 
     public Recipe() {
     }
-    public Recipe(String recipeName) {
+    public Recipe(String recipeName, Integer recipeStartTime) {
         this.recipeName = recipeName;
+        this.recipeStartTime = recipeStartTime;
     }
 
     public List<Task> getTasks() {
