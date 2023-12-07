@@ -73,7 +73,7 @@ public class OvercookedPlannerApp {
             Task task = character.getNextElement();
             while(task != null) {
                 LOGGER.info(task.getName() + (task.isHandEmpty() ? "" : " ✋"));
-                LOGGER.info("Task order: " + task.getStartTime());
+                //LOGGER.info("Task order: " + task.getStartTime());
                 task = task.getNextElement();
             }
         }

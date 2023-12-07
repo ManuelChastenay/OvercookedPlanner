@@ -10,4 +10,8 @@ public class Pathfinding {
     public Pathfinding(Grid grid){
         this.grid = grid;
     }
+
+    public static void calculateDistance(Object t1, Object t2){
+
+    }
 }
