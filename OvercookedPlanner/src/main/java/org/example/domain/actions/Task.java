@@ -72,6 +72,10 @@ public class Task extends TaskOrCharacter {
         return null;
     }
 
+    public Integer getPreviousTaskId() {
+        return getPreviousTask() == null ? null : getPreviousTask().id;
+    }
+
     public Character getCharacter() {
         return character;
     }
@@ -114,22 +118,11 @@ public class Task extends TaskOrCharacter {
         return previousTasks;
     }
 
-    public Boolean isHandEmpty(){
-        // Action prend objet
-        if(incomingItem) return false;
-        // Action prend pas objet, mais action précédente oui
-        if(getPreviousTask() != null && !getPreviousTask().isHandEmpty() && !outcomingItem) return false;
-
-        return true;
+    public Boolean hasIncoming() {
+        return incomingItem;
     }
 
-    public Boolean isItemInHandValid(){
-        if(getPreviousTask() == null) {
-            return !outcomingItem;
-        }
-        if(getPreviousTask().isHandEmpty()) {
-            return !outcomingItem;
-        }
-        return !incomingItem;
+    public Boolean hasOutcoming() {
+        return outcomingItem;
     }
 }

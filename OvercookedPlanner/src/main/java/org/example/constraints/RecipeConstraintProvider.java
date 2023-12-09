@@ -2,15 +2,12 @@ package org.example.constraints;
 
 import org.example.domain.Character;
 import org.example.domain.actions.Task;
-import org.example.utils.Pathfinding;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.stream.Constraint;
 import org.optaplanner.core.api.score.stream.ConstraintFactory;
 import org.optaplanner.core.api.score.stream.ConstraintProvider;
 import org.optaplanner.core.api.score.stream.Joiners;
-
-import java.util.Objects;
 
 public class RecipeConstraintProvider implements ConstraintProvider {
     @Override
@@ -24,10 +21,11 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 //Avoir un eventlistener qui gère les valeurs de startTime serait mieux qu'avoir le solveur qui s'en occuppe.
                 penalizeDependenciesOrderTaskDependency(constraintFactory),
 
-                //cantHoldMoreThanOneItem(constraintFactory),
+                cantDoActionWithoutNeededItem(constraintFactory),
+                cantOutputItemWhenAlreadyHaveItemNotUsed(constraintFactory),
 
                 //Soft constraints
-                penalizeChracterDoingNothing(constraintFactory)
+                //penalizeCharacterDoingNothing(constraintFactory)
         };
     }
 
@@ -69,27 +67,31 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .penalize(HardSoftScore.ONE_SOFT/*, (schedule1, schedule2) -> Math.abs(schedule1.getTaskAmount() - schedule2.getTaskAmount())*/).asConstraint("Minimize Step amount");
     }
 
-    private Constraint penalizeChracterDoingNothing(ConstraintFactory constraintFactory) {
+    private Constraint penalizeCharacterDoingNothing(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Character.class)
                 .filter(character -> character.getNextElement() == null)
                 .penalize(HardSoftLongScore.ONE_SOFT).asConstraint("All characters must work");
     }
 
-    /*private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEach(Task.class)
-                //.filter(Task::isLast)
-                .penalizeLong(HardSoftLongScore.ONE_SOFT,
-                    task -> Pathfinding.calculateDistance(task.getLocation(), task.getCharacter().getLocation()));
-    }*/
-
     //TODO: Corriger la contrainte, elle n'est pas complètement fonctionnelle.
-    private Constraint cantHoldMoreThanOneItem(ConstraintFactory constraintFactory) {
+    private Constraint cantDoActionWithoutNeededItem(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
-                .filter(task -> !task.isItemInHandValid())
+                .join(Task.class,
+                        Joiners.equal(Task::getPreviousTaskId, Task::getId))
+                .filter((task, previousTask) -> task.hasIncoming() && !previousTask.hasOutcoming())
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1) -> 1L).asConstraint("Holding More Than One Item");
+                        (t1 , t2) -> 10L).asConstraint("Starting task without needed item");
+    }
+
+    private Constraint cantOutputItemWhenAlreadyHaveItemNotUsed(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .join(Task.class,
+                        Joiners.equal(Task::getPreviousTaskId, Task::getId))
+                .filter((task, previousTask) -> task.hasOutcoming() && !task.hasIncoming() && previousTask.hasOutcoming())
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        (t1 , t2) -> 10L).asConstraint("Can't take more than one item");
     }
 }

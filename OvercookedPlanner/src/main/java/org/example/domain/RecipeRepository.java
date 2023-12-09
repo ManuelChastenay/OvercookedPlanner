@@ -30,32 +30,32 @@ public class RecipeRepository {
 
         Recipe onionSoup = new Recipe(ONION_SOUP_RECIPE);
 
-        Task takeOnionTask1 = new Task("Take onion1", true, false);
-        Task takeOnionTask2 = new Task("Take onion2", true, false);
+        Task takeOnionTask1 = new Task("Take onion1", false, true);
+        Task takeOnionTask2 = new Task("Take onion2", false, true);
         taskList.add(takeOnionTask1);
         taskList.add(takeOnionTask2);
 
         //Pour l'instant, on coupe l'objet dans les mains et le le reprends, on ne s'en discossie pas vraiment
-        Task cutOnionTask1 = new Task("Cut onion1", takeOnionTask1, false, false);
-        Task cutOnionTask2 = new Task("Cut onion2", takeOnionTask2, false, false);
+        Task cutOnionTask1 = new Task("Cut onion1", takeOnionTask1, true, true);
+        Task cutOnionTask2 = new Task("Cut onion2", takeOnionTask2, true, true);
         taskList.add(cutOnionTask1);
         taskList.add(cutOnionTask2);
 
-        Task placeOnionInPotTask1 = new Task("Place onion1 in pot", cutOnionTask1, false, true);
-        Task placeOnionInPotTask2 = new Task("Place onion2 in pot", cutOnionTask2, false, true);
+        Task placeOnionInPotTask1 = new Task("Place onion1 in pot", cutOnionTask1, true, false);
+        Task placeOnionInPotTask2 = new Task("Place onion2 in pot", cutOnionTask2, true, false);
         taskList.add(placeOnionInPotTask1);
         taskList.add(placeOnionInPotTask2);
 
         List<Task> takeBowlDependencies = new ArrayList<>();
         takeBowlDependencies.add(placeOnionInPotTask1);
         takeBowlDependencies.add(placeOnionInPotTask2);
-        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, true, false);
+        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, false, true);
         taskList.add(takeBowlTask);
 
-        Task putSoupTask = new Task("Put soup in bowl", takeBowlTask, false, false);
+        Task putSoupTask = new Task("Put soup in bowl", takeBowlTask, true, true);
         taskList.add(putSoupTask);
 
-        Task serveSoupTask = new Task("Serve soup", putSoupTask, false, true);
+        Task serveSoupTask = new Task("Serve soup", putSoupTask, true, false);
         taskList.add(serveSoupTask);
 
         //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin

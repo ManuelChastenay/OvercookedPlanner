@@ -73,7 +73,7 @@ public class OvercookedPlannerApp {
             LOGGER.info(("Character " + character.getId()));
             Task task = character.getNextElement();
             while(task != null) {
-                LOGGER.info(task.getName() + (task.isHandEmpty() ? "" : " ✋"));
+                LOGGER.info(task.getName() + (task.hasOutcoming() ? " ✋" : ""));
                 task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
                 LOGGER.info(String.valueOf(task.getStartTime()));
                 LOGGER.info(" ");
