@@ -76,13 +76,13 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .penalize(HardSoftLongScore.ONE_SOFT).asConstraint("All characters must work");
     }
 
-    /*private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
-        return constraintFactory
+    private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
+        return (Constraint) constraintFactory
                 .forEach(Task.class)
                 //.filter(Task::isLast)
                 .penalizeLong(HardSoftLongScore.ONE_SOFT,
                     task -> Pathfinding.calculateDistance(task.getLocation(), task.getCharacter().getLocation()));
-    }*/
+    }
 
     //TODO: Corriger la contrainte, elle n'est pas complètement fonctionnelle.
     private Constraint cantHoldMoreThanOneItem(ConstraintFactory constraintFactory) {

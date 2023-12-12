@@ -18,6 +18,8 @@ public class Task extends TaskOrCharacter {
     private Recipe currentRecipe;
     private List<Task> dependentTasks;
 
+    private String locationType;
+
     @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrCharacter previousElement;
 
@@ -36,13 +38,13 @@ public class Task extends TaskOrCharacter {
 
     }
 
-    public Task(String name, boolean incomingItem, boolean outcomingItem) {
+    public Task(String name, boolean incomingItem, boolean outcomingItem, String locationType) {
         this.name = name;
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
     }
 
-    public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem){
+    public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem, String locationType){
         this.name = name;
         this.dependentTasks = new ArrayList<>();
         dependentTasks.add(dependentTask);
@@ -50,12 +52,14 @@ public class Task extends TaskOrCharacter {
         this.outcomingItem = outcomingItem;
     }
 
-    public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem){
+    public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem, String locationType){
         this.name = name;
         this.dependentTasks = dependentTasks;
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
     }
+
+    public String getLocation(){return locationType; }
 
     public String getName() {
         return name;
