@@ -27,7 +27,8 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 //cantHoldMoreThanOneItem(constraintFactory),
 
                 //Soft constraints
-                penalizeChracterDoingNothing(constraintFactory)
+                penalizeChracterDoingNothing(constraintFactory),
+                minimizeDistanceFromTaskToNext(constraintFactory)
         };
     }
 
@@ -77,11 +78,14 @@ public class RecipeConstraintProvider implements ConstraintProvider {
     }
 
     private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
-        return (Constraint) constraintFactory
+        return constraintFactory
                 .forEach(Task.class)
-                //.filter(Task::isLast)
-                .penalizeLong(HardSoftLongScore.ONE_SOFT,
-                    task -> Pathfinding.calculateDistance(task.getLocation(), task.getCharacter().getLocation()));
+                .join(Task.class, Joiners.equal(Task::getPreviousTask))
+                .filter((currentTask, previousTask)-> currentTask.getLastPosition() != null)
+                .penalizeLong(
+                        HardSoftLongScore.ONE_SOFT, // Le poids de la pénalité.
+                        (currentTask, previousTask) -> Pathfinding.calculateDistance(currentTask, previousTask) // La fonction de pénalité.
+                ).asConstraint("motion penalty");
     }
 
     //TODO: Corriger la contrainte, elle n'est pas complètement fonctionnelle.

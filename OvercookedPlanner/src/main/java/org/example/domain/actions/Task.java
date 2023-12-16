@@ -7,6 +7,8 @@ import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
+import javax.swing.text.Position;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +21,10 @@ public class Task extends TaskOrCharacter {
     private List<Task> dependentTasks;
 
     private String locationType;
+
+    private Point finalPosition;
+
+    private Point[] track;
 
     @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrCharacter previousElement;
@@ -42,6 +48,7 @@ public class Task extends TaskOrCharacter {
         this.name = name;
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
+        this.locationType = locationType;
     }
 
     public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem, String locationType){
@@ -50,6 +57,7 @@ public class Task extends TaskOrCharacter {
         dependentTasks.add(dependentTask);
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
+        this.locationType = locationType;
     }
 
     public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem, String locationType){
@@ -57,9 +65,20 @@ public class Task extends TaskOrCharacter {
         this.dependentTasks = dependentTasks;
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
+        this.locationType = locationType;
     }
 
-    public String getLocation(){return locationType; }
+    public Point getLastPosition() {
+        if(getPreviousTask() != null){
+            return getPreviousTask().getPosition();
+        } else{
+            return getCharacter().getLocation();
+        }
+    }
+    public Point getPosition() { return finalPosition; }
+
+    public void setPosition(Point p){ this.finalPosition = p; }
+    public String getLocationType(){return locationType; }
 
     public String getName() {
         return name;

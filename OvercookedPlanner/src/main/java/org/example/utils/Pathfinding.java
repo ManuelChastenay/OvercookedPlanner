@@ -1,11 +1,12 @@
 package org.example.utils;
 
+import com.github.javaparser.utils.Pair;
+import org.example.domain.actions.Task;
 import org.example.domain.grid.Grid;
+import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.awt.geom.PathIterator;
+import java.util.*;
 import java.awt.Point;
 
 public class Pathfinding {
@@ -15,11 +16,105 @@ public class Pathfinding {
     private static Grid grid;
     private static Map<String, List<Point>> linkedSpecialPlaces = new HashMap<String, List<Point>>();
 
-    public static long calculateDistance(String t1, Point t2){
+    public static long calculateDistance(Task t, Task pt){
+        Point lastPoint = t.getLastPosition();
+        String locationType = t.getLocationType();
+        List<Point> allPositions = linkedSpecialPlaces.get(locationType);
 
+        Pair<Double, List<Point>> bestPath = new Pair<Double, List<Point>>(Double.MAX_VALUE, null);
 
-        return 0;
+        for(Point goal : allPositions){
+            Pair<Double, List<Point>> newPath = aStar(lastPoint, goal);
+            if(newPath.a <= bestPath.a && newPath.a != -1) {
+                bestPath = newPath;
+            }
+        }
+
+        if(bestPath.b !=null){
+            t.setPosition(bestPath.b.getLast());
+        } else{
+            t.setPosition(lastPoint);
+        }
+
+        long distance = Math.round(bestPath.a);
+
+        if (distance < 0) {
+            distance = Long.MAX_VALUE;
+        }
+
+        return distance;
     }
+
+    private static Pair<Double, List<Point>> aStar (Point start, Point goal){
+        Map<Point, Double> g = new HashMap<Point, Double>(); // Calcule le coût de déplacement pour chaques points à partir du point de départ
+        Map<Point, Point> parents = new HashMap<Point, Point>(); // Permet de garder en mémoire le chemin parcouru par l'algorithme
+
+        // Voisins candidats aux noeuds déjà solutionnés, l'heuristique utilisé est le coût du point de départ à ce point (trouvable dans g)
+        // additionné par le coût de manathan
+        PriorityQueue<Point> candidates = new PriorityQueue<Point>(Comparator.comparingDouble(p -> g.get(p) + ManathanCost(p, goal)));
+        candidates.add(start);
+        g.put(start, 0.0);
+        parents.put(start, null);
+
+        //Tant qu'il y a des candidats,
+        while(!candidates.isEmpty()){
+            Point candidate = candidates.poll();
+
+            if(candidate.x == goal.x && candidate.y == goal.y){ //Cela veux dire que l'algorithme a trouvé la solution finale.
+                return new Pair<Double, List<Point>>(g.get(candidate), getPath(goal, parents));
+            }
+
+            //Ajout des prochains candidats.
+            for(Point neighbor : getNeighbors(candidate)){
+                double newCost = g.get(candidate) + moveCost(candidate, neighbor);
+                if(!g.containsKey(neighbor) || newCost< g.get(neighbor)){
+                    g.put(neighbor, newCost);
+                    candidates.add(neighbor);
+                    parents.put(neighbor, candidate);
+                }
+            }
+        }
+
+        return new Pair<Double, List<Point>>(-1.0, new ArrayList<>());
+    }
+
+    private static List<Point> getNeighbors(Point current){
+        List<Point> neighbors = new ArrayList<Point>();
+        for(int i =-1; i<=1; i++){
+            for(int j = -1; j<= 1; j++){
+                if(i != 0 && j != 0){
+                    int newX = current.x + i;
+                    int newY = current.y + j;
+
+                    if(isValid(newX, newY, grid.getGrid())){
+                        neighbors.add(new Point(newX, newY));
+                    }
+                }
+            }
+        }
+        return neighbors;
+    }
+
+    private static List<Point> getPath(Point end, Map<Point, Point> parents ){
+        Point current = end;
+        List<Point> path = new ArrayList<>();
+
+        while(current!=null) {
+            path.add(current);
+            current = parents.get(current);
+        }
+
+        return path.reversed();
+    }
+
+    private static int ManathanCost(Point a, Point b){
+        return Math.abs(a.x-b.x) + (a.y+b.y);
+    }
+
+    private static double moveCost (Point a, Point b){
+        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y-b.y,2));
+    }
+
 
     public static void setGrid(Grid g) {
         grid = g;
