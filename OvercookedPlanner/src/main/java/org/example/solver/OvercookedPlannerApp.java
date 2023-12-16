@@ -35,7 +35,6 @@ public class OvercookedPlannerApp {
         // TODO: Ajouter une classe comme Menu pour regrouper un collection de recettes.
         KitchenSchedule problem = generateDemoData();
 
-        Pathfinding.setGrid(grid);
 
         // Solve the problem
         Solver<KitchenSchedule> solver = solverFactory.buildSolver();
@@ -80,6 +79,7 @@ public class OvercookedPlannerApp {
                 LOGGER.info(task.getName() + (task.isHandEmpty() ? "" : " ✋"));
                 task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
                 LOGGER.info(String.valueOf(task.getStartTime()));
+                LOGGER.info(" "+ task.getPosition().toString());
                 LOGGER.info(" ");
                 //LOGGER.info("Task order: " + task.getStartTime());
                 task = task.getNextElement();

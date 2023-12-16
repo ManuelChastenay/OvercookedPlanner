@@ -80,11 +80,9 @@ public class RecipeConstraintProvider implements ConstraintProvider {
     private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
-                .join(Task.class, Joiners.equal(Task::getPreviousTask))
-                .filter((currentTask, previousTask)-> currentTask.getLastPosition() != null)
                 .penalizeLong(
                         HardSoftLongScore.ONE_SOFT, // Le poids de la pénalité.
-                        (currentTask, previousTask) -> Pathfinding.calculateDistance(currentTask, previousTask) // La fonction de pénalité.
+                        (currentTask) -> Pathfinding.calculateDistance(currentTask) // La fonction de pénalité.
                 ).asConstraint("motion penalty");
     }
 

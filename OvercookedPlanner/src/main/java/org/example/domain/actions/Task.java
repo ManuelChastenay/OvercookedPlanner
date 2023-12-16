@@ -44,28 +44,28 @@ public class Task extends TaskOrCharacter {
 
     }
 
-    public Task(String name, boolean incomingItem, boolean outcomingItem, String locationType) {
+    public Task(String name, boolean incomingItem, boolean outcomingItem, Point position) {
         this.name = name;
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
-        this.locationType = locationType;
+        this.finalPosition = position;
     }
 
-    public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem, String locationType){
+    public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem, Point position){
         this.name = name;
         this.dependentTasks = new ArrayList<>();
         dependentTasks.add(dependentTask);
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
-        this.locationType = locationType;
+        this.finalPosition = position;
     }
 
-    public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem, String locationType){
+    public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem, Point position){
         this.name = name;
         this.dependentTasks = dependentTasks;
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
-        this.locationType = locationType;
+        this.finalPosition = position;
     }
 
     public Point getLastPosition() {

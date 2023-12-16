@@ -16,33 +16,10 @@ public class Pathfinding {
     private static Grid grid;
     private static Map<String, List<Point>> linkedSpecialPlaces = new HashMap<String, List<Point>>();
 
-    public static long calculateDistance(Task t, Task pt){
+    public static long calculateDistance(Task t){
         Point lastPoint = t.getLastPosition();
-        String locationType = t.getLocationType();
-        List<Point> allPositions = linkedSpecialPlaces.get(locationType);
-
-        Pair<Double, List<Point>> bestPath = new Pair<Double, List<Point>>(Double.MAX_VALUE, null);
-
-        for(Point goal : allPositions){
-            Pair<Double, List<Point>> newPath = aStar(lastPoint, goal);
-            if(newPath.a <= bestPath.a && newPath.a != -1) {
-                bestPath = newPath;
-            }
-        }
-
-        if(bestPath.b !=null){
-            t.setPosition(bestPath.b.getLast());
-        } else{
-            t.setPosition(lastPoint);
-        }
-
-        long distance = Math.round(bestPath.a);
-
-        if (distance < 0) {
-            distance = Long.MAX_VALUE;
-        }
-
-        return distance;
+        Pair<Double, List<Point>> newPath = aStar(lastPoint, t.getPosition());
+        return newPath.a.longValue();
     }
 
     private static Pair<Double, List<Point>> aStar (Point start, Point goal){
@@ -75,7 +52,7 @@ public class Pathfinding {
             }
         }
 
-        return new Pair<Double, List<Point>>(-1.0, new ArrayList<>());
+        return new Pair<Double, List<Point>>(Double.MAX_VALUE, new ArrayList<>());
     }
 
     private static List<Point> getNeighbors(Point current){
@@ -128,6 +105,10 @@ public class Pathfinding {
                 }
             }
         }
+    }
+
+    public static List<Point> getRelatedPositionsOf(String location){
+        return linkedSpecialPlaces.get(location);
     }
 
     private static void checkNeighbors(int x, int y, String[][] grid){
