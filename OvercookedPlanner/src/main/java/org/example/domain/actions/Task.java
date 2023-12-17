@@ -149,10 +149,6 @@ public class Task extends TaskOrCharacter {
     }
 
     public List<Task> getRecipePreviousTasks(){
-        List<Task> previousTasks = getPreviousTasks();
-        List<Task> otherPreviousTasks = currentRecipe.getOtherPreviousTasks(character, startTime);
-        otherPreviousTasks.addAll(previousTasks);
-
-        return otherPreviousTasks;
+        return currentRecipe.getAllPreviousTasks(startTime);
     }
 }

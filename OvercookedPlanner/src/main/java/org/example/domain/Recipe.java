@@ -24,26 +24,25 @@ public class Recipe {
         return tasks;
     }
 
-    public List<Task> getOtherPreviousTasks(Character character, int startTime){
-        Map<Character, Task> otherEndedTasks = new HashMap<>();
+    public List<Task> getAllPreviousTasks(int startTime){
+        Map<Character, Task> lastEndedTasks = new HashMap<>();
+
         for(Task task : tasks){
-            if(task.getCharacter() != character && (
-                    otherEndedTasks.get(task.getCharacter()) == null ||
-                            //TODO à vérifier
-                            (otherEndedTasks.get(task.getCharacter()).getStartTime() < task.getStartTime() &&
-                            task.getStartTime() + task.getDuration() < startTime)
-            )){
-                otherEndedTasks.put(task.getCharacter(), task);
+            if(lastEndedTasks.get(task.getCharacter()) == null ||
+                (lastEndedTasks.get(task.getCharacter()).getStartTime() < task.getStartTime() &&
+                task.getStartTime() + task.getDuration() < startTime)
+            ){
+                lastEndedTasks.put(task.getCharacter(), task);
             }
         }
 
-        List<Task> otherPreviousTasks = new ArrayList<>();
-        for(Map.Entry<Character, Task> entry : otherEndedTasks.entrySet()){
-            otherPreviousTasks.addAll(entry.getValue().getPreviousTasks());
-            otherPreviousTasks.add(entry.getValue());
+        List<Task> allPreviousTasks = new ArrayList<>();
+        for(Map.Entry<Character, Task> entry : lastEndedTasks.entrySet()){
+            allPreviousTasks.addAll(entry.getValue().getPreviousTasks());
+            allPreviousTasks.add(entry.getValue());
         }
 
-        return otherPreviousTasks;
+        return allPreviousTasks;
     }
 
     public void setTasks(List<Task> tasks) {
