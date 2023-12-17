@@ -113,6 +113,7 @@ public class Task extends TaskOrCharacter {
         } else{
             return getCharacter().getLocation();
         }
+    }
 
     public String getName() {
         return name;
@@ -129,13 +130,11 @@ public class Task extends TaskOrCharacter {
         }
         return null;
     }
-    public Integer getPreviousTaskId() {
-        return getPreviousTask() == null ? null : getPreviousTask().id;
-    }
 
     public Integer getPreviousTaskId() {
         return getPreviousTask() == null ? null : getPreviousTask().id;
     }
+
 
     public Character getCharacter() {
         return character;

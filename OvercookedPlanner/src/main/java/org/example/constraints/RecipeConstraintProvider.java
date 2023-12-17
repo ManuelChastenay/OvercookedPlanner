@@ -2,6 +2,7 @@ package org.example.constraints;
 
 import org.example.domain.Character;
 import org.example.domain.actions.Task;
+import org.example.utils.Pathfinding;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.stream.*;
@@ -21,7 +22,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
 
 
                 //Soft constraints
-                penalizeChracterDoingNothing(constraintFactory),
+                penalizeCharacterDoingNothing(constraintFactory),
                 minimizeDistanceFromTaskToNext(constraintFactory),
 
         };
@@ -93,6 +94,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                         HardSoftLongScore.ONE_SOFT, // Le poids de la pénalité.
                         (currentTask, previousTask) -> Pathfinding.calculateDistance(currentTask,previousTask ) // La fonction de pénalité.
                 ).asConstraint("motion penalty");
+    }
 
     private Constraint firstActionCantRequireItem(ConstraintFactory constraintFactory) {
         return constraintFactory
