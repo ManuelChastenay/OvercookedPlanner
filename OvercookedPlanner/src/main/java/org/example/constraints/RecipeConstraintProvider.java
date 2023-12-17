@@ -35,6 +35,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         return constraintFactory
                 .forEach(Task.class)
                 .join(Task.class,
+                        Joiners.equal(Task::getCharacter),
                         Joiners.lessThan(Task::getId))
                 .filter((t1, t2) ->
                         (t2.getDependencies().contains(t1) && !t2.getRecipePreviousTasks().contains(t1)) ||
