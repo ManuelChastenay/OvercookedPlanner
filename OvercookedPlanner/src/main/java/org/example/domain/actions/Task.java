@@ -1,18 +1,23 @@
 package org.example.domain.actions;
 
+import com.github.javaparser.utils.Pair;
 import org.example.domain.Character;
 import org.example.domain.Recipe;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+
 import org.optaplanner.core.api.domain.valuerange.ValueRange;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
+
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @PlanningEntity
 public class Task extends TaskOrCharacter {
@@ -23,20 +28,39 @@ public class Task extends TaskOrCharacter {
     private Recipe currentRecipe;
     private List<Task> dependentTasks;
 
+
+
+    private  List<Point> relatedPositions;
+
+    @PlanningVariable(valueRangeProviderRefs = "positionRange")
+    private Integer positionIndex;
+
     private Item inputItem;
 
     private Item outputItem;
+
 
     @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrCharacter previousElement;
 
     @AnchorShadowVariable(sourceVariableName = PREVIOUS_ELEMENT)
     private Character character;
-    
-    //ValueRangeProvider se trouve dans la classe Recipe, pour avoir accès au nombre de tasks.
-    //TODO: Modifier lors de l'implémentation du temps pour l'ordonnancement
+
+
     @PlanningVariable(valueRangeProviderRefs = {"startTime"})
     private Integer startTime;
+
+    @ValueRangeProvider(id = "positionRange")
+    public List<Integer> getPositionIndexRange() {
+        return IntStream.range(0, this.relatedPositions.size()).boxed().collect(Collectors.toList());
+    }
+
+    private Boolean incomingItem; //True si la tâche fais passer le character de main vides à main pleines, false sinon.
+    private Boolean outcomingItem; //True si la tâche fais passer le character de main pleines à main vides, false sinon.
+
+    //ValueRangeProvider se trouve dans la classe Recipe, pour avoir accès au nombre de tasks.
+    //TODO: Modifier lors de l'implémentation du temps pour l'ordonnancement
+
 
     @ValueRangeProvider(id = "startTime")
     public List<Integer> getStartTimeValueRange() {
@@ -55,29 +79,40 @@ public class Task extends TaskOrCharacter {
 
     }
 
-    public Task(String name, Item inputItem, Item outputItem, int duration) {
+    public Task(String name, Item inputItem, Item outputItem, int duration, List<Point> position) {
         this.name = name;
         this.inputItem = inputItem;
         this.outputItem = outputItem;
         this.duration = duration;
+        this.relatedPositions = position;
     }
 
-    public Task(String name, Task dependentTask, Item inputItem, Item outputItem, int duration){
+    public Task(String name, Task dependentTask, Item inputItem, Item outputItem, int duration, List<Point> position){
         this.name = name;
         this.dependentTasks = new ArrayList<>();
         dependentTasks.add(dependentTask);
         this.inputItem = inputItem;
         this.outputItem = outputItem;
         this.duration = duration;
+        this.relatedPositions = position;
     }
 
-    public Task(String name, List<Task> dependentTasks, Item inputItem, Item outputItem, int duration){
+    public Task(String name, List<Task> dependentTasks, Item inputItem, Item outputItem, int duration, List<Point> position){
         this.name = name;
         this.dependentTasks = dependentTasks;
         this.inputItem = inputItem;
         this.outputItem = outputItem;
         this.duration = duration;
+        this.relatedPositions = position;
     }
+    public Point getPosition() { return relatedPositions.get(positionIndex); }
+
+    public Point getLastPosition() {
+        if(getPreviousTask() != null){
+            return getPreviousTask().getPosition();
+        } else{
+            return getCharacter().getLocation();
+        }
 
     public String getName() {
         return name;
@@ -87,11 +122,15 @@ public class Task extends TaskOrCharacter {
         return previousElement;
     }
 
+
     public Task getPreviousTask() {
         if(getPreviousElement() instanceof Task) {
             return (Task) getPreviousElement();
         }
         return null;
+    }
+    public Integer getPreviousTaskId() {
+        return getPreviousTask() == null ? null : getPreviousTask().id;
     }
 
     public Integer getPreviousTaskId() {

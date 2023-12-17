@@ -4,10 +4,7 @@ import org.example.domain.Character;
 import org.example.domain.actions.Task;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
-import org.optaplanner.core.api.score.stream.Constraint;
-import org.optaplanner.core.api.score.stream.ConstraintFactory;
-import org.optaplanner.core.api.score.stream.ConstraintProvider;
-import org.optaplanner.core.api.score.stream.Joiners;
+import org.optaplanner.core.api.score.stream.*;
 
 public class RecipeConstraintProvider implements ConstraintProvider {
     @Override
@@ -24,8 +21,9 @@ public class RecipeConstraintProvider implements ConstraintProvider {
 
 
                 //Soft constraints
-                penalizeCharacterDoingNothing(constraintFactory)
-                //minimizeTotalTime(constraintFactory)
+                penalizeChracterDoingNothing(constraintFactory),
+                minimizeDistanceFromTaskToNext(constraintFactory),
+
         };
     }
 
@@ -86,6 +84,16 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                         t -> 1000L).asConstraint("First action has to start at time 0");
     }
 
+
+    private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .join(Task.class, Joiners.equal(Task::getPreviousTaskId, Task::getId))
+                .penalizeLong(
+                        HardSoftLongScore.ONE_SOFT, // Le poids de la pénalité.
+                        (currentTask, previousTask) -> Pathfinding.calculateDistance(currentTask,previousTask ) // La fonction de pénalité.
+                ).asConstraint("motion penalty");
+
     private Constraint firstActionCantRequireItem(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
@@ -109,5 +117,6 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .forEach(Character.class)
                 .filter(character -> character.getNextElement() == null)
                 .penalize(HardSoftLongScore.ONE_SOFT).asConstraint("All characters must work");
+
     }
 }

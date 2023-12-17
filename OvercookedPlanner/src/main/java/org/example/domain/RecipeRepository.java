@@ -2,6 +2,7 @@ package org.example.domain;
 
 import org.example.domain.actions.Item;
 import org.example.domain.actions.Task;
+import org.example.utils.Pathfinding;
 
 import java.util.*;
 
@@ -34,20 +35,20 @@ public class RecipeRepository {
         Recipe onionSoup = new Recipe(ONION_SOUP_RECIPE, startTime);
 
         Item onion = new Item("\uD83E\uDDC5");
-        Task takeOnionTask1 = new Task("Take onion", null, onion, 1);
-        Task takeOnionTask2 = new Task("Take onion", null, onion, 1);
+        Task takeOnionTask1 = new Task("Take onion", null, onion, 1, Pathfinding.getRelatedPositionsOf("🧅"));
+        Task takeOnionTask2 = new Task("Take onion", null, onion, 1, Pathfinding.getRelatedPositionsOf("🧅"));
         taskList.add(takeOnionTask1);
         taskList.add(takeOnionTask2);
 
-        //Pour l'instant, on coupe l'objet dans les mains et le le reprends, on ne s'en discossie pas vraiment
         Item onionCut = new Item("\uD83E\uDDC5\uD83D\uDD2A");
-        Task cutOnionTask1 = new Task("Cut onion", onion, onionCut, 10);
-        Task cutOnionTask2 = new Task("Cut onion", onion, onionCut, 10);
+        Task cutOnionTask1 = new Task("Cut onion", onion, onionCut, 10,Pathfinding.getRelatedPositionsOf("🔪"));
+        Task cutOnionTask2 = new Task("Cut onion", onion, onionCut, 10,Pathfinding.getRelatedPositionsOf("🔪"));
         taskList.add(cutOnionTask1);
         taskList.add(cutOnionTask2);
 
-        Task placeOnionInPotTask1 = new Task("Place onion in pot", onionCut, null, 1);
-        Task placeOnionInPotTask2 = new Task("Place onion in pot", onionCut, null, 1);
+        Task placeOnionInPotTask1 = new Task("Place onion in pot", onionCut, null, 1,Pathfinding.getRelatedPositionsOf("🍲"));
+        Task placeOnionInPotTask2 = new Task("Place onion in pot", onionCut, null, 1,Pathfinding.getRelatedPositionsOf("🍲"));
+
         taskList.add(placeOnionInPotTask1);
         taskList.add(placeOnionInPotTask2);
 
@@ -55,14 +56,15 @@ public class RecipeRepository {
         List<Task> takeBowlDependencies = new ArrayList<>();
         takeBowlDependencies.add(placeOnionInPotTask1);
         takeBowlDependencies.add(placeOnionInPotTask2);
-        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, null, bowl, 1);
+
+        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, null, bowl, 1, Pathfinding.getRelatedPositionsOf("🆕"));
         taskList.add(takeBowlTask);
 
         Item onionSoupBowl = new Item("\uD83E\uDD63\uD83E\uDDC5");
-        Task putSoupTask = new Task("Put onion soup in bowl", takeBowlTask, bowl, onionSoupBowl, 5);
+        Task putSoupTask = new Task("Put onion soup in bowl", takeBowlTask, bowl, onionSoupBowl, 5, Pathfinding.getRelatedPositionsOf("🍲"));
         taskList.add(putSoupTask);
 
-        Task serveSoupTask = new Task("Serve onion soup", onionSoupBowl, null, 1);
+        Task serveSoupTask = new Task("Serve onion soup", onionSoupBowl, null, 1, Pathfinding.getRelatedPositionsOf("🤲"));
         taskList.add(serveSoupTask);
 
         // Random order to full test the solution
@@ -98,12 +100,13 @@ public class RecipeRepository {
         takeBowlDependencies.add(placeBrocoliInPotTask1);
         takeBowlDependencies.add(placeBrocoliInPotTask2);
         Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, true, false);
+
         taskList.add(takeBowlTask);
 
-        Task putSoupTask = new Task("Put soup in bowl", takeBowlTask, false, false);
+        Task putSoupTask = new Task("Put soup in bowl", takeBowlTask, false, false, Pathfinding.getRelatedPositionsOf("🍲"));
         taskList.add(putSoupTask);
 
-        Task serveSoupTask = new Task("Serve soup", putSoupTask, false, true);
+        Task serveSoupTask = new Task("Serve soup", putSoupTask, false, true, Pathfinding.getRelatedPositionsOf("🤲"));
         taskList.add(serveSoupTask);
 
         //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin

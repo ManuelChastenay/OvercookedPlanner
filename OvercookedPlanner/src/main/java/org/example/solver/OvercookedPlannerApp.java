@@ -6,6 +6,7 @@ import org.example.domain.Character;
 import org.example.domain.actions.Task;
 import org.example.domain.actions.TaskOrCharacter;
 import org.example.domain.grid.Grid;
+import org.example.utils.Pathfinding;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.optaplanner.core.config.solver.EnvironmentMode;
@@ -14,6 +15,7 @@ import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class OvercookedPlannerApp {
         // Load the problem
         // TODO: Ajouter une classe comme Menu pour regrouper un collection de recettes.
         KitchenSchedule problem = generateDemoData();
+
 
         // Solve the problem
         Solver<KitchenSchedule> solver = solverFactory.buildSolver();
@@ -77,6 +80,7 @@ public class OvercookedPlannerApp {
                 LOGGER.info(task.getName() + (task.getOutputItem() != null ? " ✋(" + task.getOutputItem().getName() + ")" : ""));
                 //task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
                 LOGGER.info(String.valueOf(task.getStartTime()));
+                LOGGER.info(" "+ task.getPosition().toString());
                 LOGGER.info(" ");
                 //LOGGER.info("Task order: " + task.getStartTime());
                 task = task.getNextElement();
