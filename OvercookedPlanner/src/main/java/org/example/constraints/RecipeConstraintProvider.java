@@ -2,7 +2,6 @@ package org.example.constraints;
 
 import org.example.domain.Character;
 import org.example.domain.actions.Task;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.stream.Constraint;
 import org.optaplanner.core.api.score.stream.ConstraintFactory;
@@ -21,10 +20,10 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 firstActionHasBaseStartTime(constraintFactory),
                 firstActionCantHaveDependencies(constraintFactory),
                 firstActionCantRequireItem(constraintFactory),
-
+                penalizeCharacterDoingNothing(constraintFactory),
 
                 //Soft constraints
-                penalizeCharacterDoingNothing(constraintFactory)
+                penalizeLenghtOfSchedule(constraintFactory)
                 //minimizeTotalTime(constraintFactory)
         };
     }
@@ -38,8 +37,8 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .join(Task.class,
                         Joiners.lessThan(Task::getId))
                 .filter((t1, t2) ->
-                        (t2.getDependencies().contains(t1) && !t2.getPreviousTasks().contains(t1)) ||
-                        (t1.getDependencies().contains(t2) && !t1.getPreviousTasks().contains(t2))
+                        (t2.getDependencies().contains(t1) && !(t2.getPreviousTasks().contains(t1) || t2.getRecipePreviousTasks().contains(t1))) ||
+                        (t1.getDependencies().contains(t2) && !(t1.getPreviousTasks().contains(t2) || t1.getRecipePreviousTasks().contains(t2)))
                 )
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
                         (t1, t2) -> 500L).asConstraint("Task Dependencies Requires");
@@ -65,7 +64,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                         Joiners.equal(Task::getPreviousTaskId, Task::getId))
                 .filter((task, previousTask) -> task.getInputItem() != null && task.getInputItem() != previousTask.getOutputItem())
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1, t2) -> 200L).asConstraint("Starting task without needed item");
+                        (t1, t2) -> 2000L).asConstraint("Starting task without needed item");
     }
 
     private Constraint cantOutputItemWhenAlreadyHaveItemNotUsed(ConstraintFactory constraintFactory) {
@@ -75,7 +74,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                         Joiners.equal(Task::getPreviousTaskId, Task::getId))
                 .filter((task, previousTask) -> task.getOutputItem() != null && task.getInputItem() == null && previousTask.getOutputItem() != null)
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1 , t2) -> 100L).asConstraint("Can't take more than one item");
+                        (t1 , t2) -> 1000L).asConstraint("Can't take more than one item");
     }
 
     private Constraint firstActionHasBaseStartTime(ConstraintFactory constraintFactory) {
@@ -102,12 +101,19 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                         t -> 1000L).asConstraint("First action can't have dependencies");
     }
 
-    //SOFT CONSTRAINTS
-
     private Constraint penalizeCharacterDoingNothing(ConstraintFactory constraintFactory) {
         return constraintFactory
-                .forEach(Character.class)
-                .filter(character -> character.getNextElement() == null)
-                .penalize(HardSoftLongScore.ONE_SOFT).asConstraint("All characters must work");
+            .forEach(Character.class)
+            .filter(character -> character.getNextElement() == null)
+            .penalizeLong(HardSoftLongScore.ONE_HARD, c -> 10000L).asConstraint("All characters must work");
+    }
+
+    //SOFT CONSTRAINTS
+
+    private Constraint penalizeLenghtOfSchedule(ConstraintFactory constraintFactory) {
+        return constraintFactory
+            .forEach(Task.class)
+            .penalizeLong(HardSoftLongScore.ONE_SOFT,
+                    c -> c.getStartTime() + c.getDuration()).asConstraint("Total Sum of Task Times");
     }
 }

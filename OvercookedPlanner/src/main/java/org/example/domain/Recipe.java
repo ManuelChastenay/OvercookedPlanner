@@ -22,6 +22,14 @@ public class Recipe {
         return tasks;
     }
 
+    public List<Task> getEndedTasks(int startTime){
+        List<Task> endedTasks = new ArrayList<>();
+        for(Task task : tasks){
+            if(task.getStartTime() + task.getDuration() < startTime) endedTasks.add(task);
+        }
+        return endedTasks;
+    }
+
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
         int id = 0;

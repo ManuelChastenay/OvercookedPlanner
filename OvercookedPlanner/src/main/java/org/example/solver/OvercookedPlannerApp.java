@@ -26,7 +26,7 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(KitchenSchedule.class)
                 .withEntityClasses(Task.class, TaskOrCharacter.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft").withSecondsSpentLimit(20L))
+                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(20L))
         );
 
         // Load the problem
@@ -44,7 +44,7 @@ public class OvercookedPlannerApp {
     public static KitchenSchedule generateDemoData() {
         List<Character> characters = new ArrayList<>();
         characters.add(new Character("0"));
-        //characters.add(new Character("1"));
+        characters.add(new Character("1"));
 
         List<String> recipesToFetch = new ArrayList<>();
         recipesToFetch.add(RecipeRepository.ONION_SOUP_RECIPE);
@@ -54,7 +54,7 @@ public class OvercookedPlannerApp {
         List<Recipe> recipes = repository.getRecipes(recipesToFetch);
         List<Task> tasks = new ArrayList<>();
         recipes.forEach(recipe -> tasks.addAll(recipe.getTasks()));
-        //tasks.add(new Task("dumb task 1", null, null));
+        //tasks.add(new Task("dumb task 1", null, null, 1));
         //tasks.add(new Task("dumb task 2", tasks.getLast(), false, false));
         //tasks.add(new Task("dumb task 3", null, false, false));
         //tasks.add(new Task("dumb task 4", null, false, false));

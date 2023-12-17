@@ -3,15 +3,12 @@ package org.example.domain.actions;
 import org.example.domain.Character;
 import org.example.domain.Recipe;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.valuerange.ValueRange;
-import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @PlanningEntity
@@ -41,7 +38,6 @@ public class Task extends TaskOrCharacter {
     @ValueRangeProvider(id = "startTime")
     public List<Integer> getStartTimeValueRange() {
         List<Integer> possibleValue = new ArrayList<>();
-
 
         if(getPreviousTask() != null) possibleValue.add(getPreviousTask().startTime + getPreviousTask().duration);
         else possibleValue.add(0);
@@ -149,5 +145,9 @@ public class Task extends TaskOrCharacter {
 
     public Item getOutputItem() {
         return outputItem;
+    }
+
+    public List<Task> getRecipePreviousTasks(){
+        return currentRecipe.getEndedTasks(startTime);
     }
 }
