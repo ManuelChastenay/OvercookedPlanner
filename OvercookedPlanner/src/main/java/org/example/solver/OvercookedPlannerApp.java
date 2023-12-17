@@ -28,7 +28,7 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(KitchenSchedule.class)
                 .withEntityClasses(Task.class, TaskOrCharacter.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft").withSecondsSpentLimit(30L))
+                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft").withSecondsSpentLimit(20L))
         );
 
         // Load the problem
@@ -51,12 +51,13 @@ public class OvercookedPlannerApp {
 
         List<String> recipesToFetch = new ArrayList<>();
         recipesToFetch.add(RecipeRepository.ONION_SOUP_RECIPE);
+        //recipesToFetch.add(RecipeRepository.BROCOLI_SOUP_RECIPE);
 
         RecipeRepository repository = new RecipeRepository();
         List<Recipe> recipes = repository.getRecipes(recipesToFetch);
         List<Task> tasks = new ArrayList<>();
         recipes.forEach(recipe -> tasks.addAll(recipe.getTasks()));
-        //tasks.add(new Task("dumb task 1", false, false));
+        //tasks.add(new Task("dumb task 1", null, null));
         //tasks.add(new Task("dumb task 2", tasks.getLast(), false, false));
         //tasks.add(new Task("dumb task 3", null, false, false));
         //tasks.add(new Task("dumb task 4", null, false, false));
@@ -76,8 +77,8 @@ public class OvercookedPlannerApp {
             LOGGER.info(("Character " + character.getId()));
             Task task = character.getNextElement();
             while(task != null) {
-                LOGGER.info(task.getName() + (task.isHandEmpty() ? "" : " ✋"));
-                task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
+                LOGGER.info(task.getName() + (task.getOutputItem() != null ? " ✋(" + task.getOutputItem().getName() + ")" : ""));
+                //task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
                 LOGGER.info(String.valueOf(task.getStartTime()));
                 LOGGER.info(" "+ task.getPosition().toString());
                 LOGGER.info(" ");

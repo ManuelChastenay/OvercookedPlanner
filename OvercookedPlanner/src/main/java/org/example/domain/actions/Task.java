@@ -4,6 +4,10 @@ import com.github.javaparser.utils.Pair;
 import org.example.domain.Character;
 import org.example.domain.Recipe;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+
+import org.optaplanner.core.api.domain.valuerange.ValueRange;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
+
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -18,9 +22,12 @@ import java.util.stream.IntStream;
 @PlanningEntity
 public class Task extends TaskOrCharacter {
     private String name;
+
     private int id;
+    private int duration = 1;
     private Recipe currentRecipe;
     private List<Task> dependentTasks;
+
 
 
     private  List<Point> relatedPositions;
@@ -28,11 +35,17 @@ public class Task extends TaskOrCharacter {
     @PlanningVariable(valueRangeProviderRefs = "positionRange")
     private Integer positionIndex;
 
+    private Item inputItem;
+
+    private Item outputItem;
+
+
     @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrCharacter previousElement;
 
     @AnchorShadowVariable(sourceVariableName = PREVIOUS_ELEMENT)
     private Character character;
+
 
     @PlanningVariable(valueRangeProviderRefs = {"startTime"})
     private Integer startTime;
@@ -49,33 +62,50 @@ public class Task extends TaskOrCharacter {
     //TODO: Modifier lors de l'implémentation du temps pour l'ordonnancement
 
 
+    @ValueRangeProvider(id = "startTime")
+    public List<Integer> getStartTimeValueRange() {
+        List<Integer> possibleValue = new ArrayList<>();
+
+
+        if(getPreviousTask() != null) possibleValue.add(getPreviousTask().startTime + getPreviousTask().duration);
+        else possibleValue.add(0);
+        //Having more than 1 variable helps the planner not crashing.
+        //possibleValue.add(0);
+
+        return possibleValue;
+    }
+
     public Task(){
 
     }
 
-    public Task(String name, boolean incomingItem, boolean outcomingItem, List<Point> position) {
+    public Task(String name, Item inputItem, Item outputItem, int duration, List<Point> position) {
         this.name = name;
-        this.incomingItem = incomingItem;
-        this.outcomingItem = outcomingItem;
+        this.inputItem = inputItem;
+        this.outputItem = outputItem;
+        this.duration = duration;
         this.relatedPositions = position;
     }
 
-    public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem, List<Point>  position){
+    public Task(String name, Task dependentTask, Item inputItem, Item outputItem, int duration, List<Point> position){
         this.name = name;
         this.dependentTasks = new ArrayList<>();
         dependentTasks.add(dependentTask);
-        this.incomingItem = incomingItem;
-        this.outcomingItem = outcomingItem;
+        this.inputItem = inputItem;
+        this.outputItem = outputItem;
+        this.duration = duration;
         this.relatedPositions = position;
     }
 
-    public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem, List<Point>  position){
+    public Task(String name, List<Task> dependentTasks, Item inputItem, Item outputItem, int duration, List<Point> position){
         this.name = name;
         this.dependentTasks = dependentTasks;
-        this.incomingItem = incomingItem;
-        this.outcomingItem = outcomingItem;
+        this.inputItem = inputItem;
+        this.outputItem = outputItem;
+        this.duration = duration;
         this.relatedPositions = position;
     }
+    public Point getPosition() { return relatedPositions.get(positionIndex); }
 
     public Point getLastPosition() {
         if(getPreviousTask() != null){
@@ -83,9 +113,6 @@ public class Task extends TaskOrCharacter {
         } else{
             return getCharacter().getLocation();
         }
-    }
-    public Point getPosition() { return relatedPositions.get(positionIndex); }
-
 
     public String getName() {
         return name;
@@ -102,6 +129,10 @@ public class Task extends TaskOrCharacter {
         }
         return null;
     }
+    public Integer getPreviousTaskId() {
+        return getPreviousTask() == null ? null : getPreviousTask().id;
+    }
+
     public Integer getPreviousTaskId() {
         return getPreviousTask() == null ? null : getPreviousTask().id;
     }
@@ -134,7 +165,10 @@ public class Task extends TaskOrCharacter {
         return startTime == null ? 0 : startTime;
     }
 
-    //TODO Degueu mais fonctionnel
+    public int getDuration(){
+        return duration;
+    }
+
     public List<Task> getPreviousTasks(){
         List<Task> previousTasks = new ArrayList<>();
         if(previousElement instanceof Character) return previousTasks;
@@ -148,22 +182,11 @@ public class Task extends TaskOrCharacter {
         return previousTasks;
     }
 
-    public Boolean isHandEmpty(){
-        // Action prend objet
-        if(incomingItem) return false;
-        // Action prend pas objet, mais action précédente oui
-        if(getPreviousTask() != null && !getPreviousTask().isHandEmpty() && !outcomingItem) return false;
-
-        return true;
+    public Item getInputItem() {
+        return inputItem;
     }
 
-    public Boolean isItemInHandValid(){
-        if(getPreviousTask() == null) {
-            return !outcomingItem;
-        }
-        if(getPreviousTask().isHandEmpty()) {
-            return !outcomingItem;
-        }
-        return !incomingItem;
+    public Item getOutputItem() {
+        return outputItem;
     }
 }
