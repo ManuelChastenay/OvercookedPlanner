@@ -1,5 +1,6 @@
 package org.example.domain;
 
+import org.example.domain.actions.Item;
 import org.example.domain.actions.Task;
 
 import java.util.*;
@@ -32,37 +33,39 @@ public class RecipeRepository {
 
         Recipe onionSoup = new Recipe(ONION_SOUP_RECIPE, startTime);
 
-        Task takeOnionTask1 = new Task("Take onion1", true, false);
-        Task takeOnionTask2 = new Task("Take onion2", true, false);
+        Item onion = new Item("\uD83E\uDDC5");
+        Task takeOnionTask1 = new Task("Take onion", null, onion);
+        Task takeOnionTask2 = new Task("Take onion", null, onion);
         taskList.add(takeOnionTask1);
         taskList.add(takeOnionTask2);
 
         //Pour l'instant, on coupe l'objet dans les mains et le le reprends, on ne s'en discossie pas vraiment
-        Task cutOnionTask1 = new Task("Cut onion1", takeOnionTask1, false, false);
-        Task cutOnionTask2 = new Task("Cut onion2", takeOnionTask2, false, false);
+        Item onionCut = new Item("\uD83E\uDDC5\uD83D\uDD2A");
+        Task cutOnionTask1 = new Task("Cut onion", onion, onionCut);
+        Task cutOnionTask2 = new Task("Cut onion", onion, onionCut);
         taskList.add(cutOnionTask1);
         taskList.add(cutOnionTask2);
 
-        Task placeOnionInPotTask1 = new Task("Place onion1 in pot", cutOnionTask1, false, true);
-        Task placeOnionInPotTask2 = new Task("Place onion2 in pot", cutOnionTask2, false, true);
+        Task placeOnionInPotTask1 = new Task("Place onion in pot", onionCut, null);
+        Task placeOnionInPotTask2 = new Task("Place onion in pot", onionCut, null);
         taskList.add(placeOnionInPotTask1);
         taskList.add(placeOnionInPotTask2);
 
-        List<Task> takeBowlDependencies = new ArrayList<>();
-        takeBowlDependencies.add(placeOnionInPotTask1);
-        takeBowlDependencies.add(placeOnionInPotTask2);
-        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, true, false);
+        Item bowl = new Item("\uD83E\uDD63");
+        Task takeBowlTask = new Task("Take bowl", null, bowl);
         taskList.add(takeBowlTask);
 
-        Task putSoupTask = new Task("Put soup in bowl", takeBowlTask, false, false);
+        Item onionSoupBowl = new Item("\uD83E\uDD63\uD83E\uDDC5");
+        List<Task> takeSoupDependencies = new ArrayList<>();
+        takeSoupDependencies.add(placeOnionInPotTask1);
+        takeSoupDependencies.add(placeOnionInPotTask2);
+        Task putSoupTask = new Task("Put onion soup in bowl", takeSoupDependencies, bowl, onionSoupBowl);
         taskList.add(putSoupTask);
 
-        Task serveSoupTask = new Task("Serve soup", putSoupTask, false, true);
+        Task serveSoupTask = new Task("Serve onion soup", onionSoupBowl, null);
         taskList.add(serveSoupTask);
 
-        //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin
-        //Cette inversion a un impact majeur dans le temps de calcul, pour l'instant, avec 2 contraintes, on passe de 0.5sec à ~30 sec.
-        //taskList = taskList.reversed();
+        // Random order to full test the solution
         Collections.shuffle(taskList);
 
         onionSoup.setTasks(taskList);
