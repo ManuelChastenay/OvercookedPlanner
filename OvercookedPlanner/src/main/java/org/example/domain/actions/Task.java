@@ -1,17 +1,19 @@
 package org.example.domain.actions;
 
+import com.github.javaparser.utils.Pair;
 import org.example.domain.Character;
 import org.example.domain.Recipe;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
-import javax.swing.text.Position;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @PlanningEntity
 public class Task extends TaskOrCharacter {
@@ -20,11 +22,11 @@ public class Task extends TaskOrCharacter {
     private Recipe currentRecipe;
     private List<Task> dependentTasks;
 
-    private String locationType;
 
-    private Point finalPosition;
+    private  List<Point> relatedPositions;
 
-    private Point[] track;
+    @PlanningVariable(valueRangeProviderRefs = "positionRange")
+    private Integer positionIndex;
 
     @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrCharacter previousElement;
@@ -32,40 +34,47 @@ public class Task extends TaskOrCharacter {
     @AnchorShadowVariable(sourceVariableName = PREVIOUS_ELEMENT)
     private Character character;
 
+    @PlanningVariable(valueRangeProviderRefs = {"startTime"})
+    private Integer startTime;
+
+    @ValueRangeProvider(id = "positionRange")
+    public List<Integer> getPositionIndexRange() {
+        return IntStream.range(0, this.relatedPositions.size()).boxed().collect(Collectors.toList());
+    }
+
     private Boolean incomingItem; //True si la tâche fais passer le character de main vides à main pleines, false sinon.
     private Boolean outcomingItem; //True si la tâche fais passer le character de main pleines à main vides, false sinon.
 
     //ValueRangeProvider se trouve dans la classe Recipe, pour avoir accès au nombre de tasks.
     //TODO: Modifier lors de l'implémentation du temps pour l'ordonnancement
-    @PlanningVariable(valueRangeProviderRefs = {"startTime"})
-    private Integer startTime;
+
 
     public Task(){
 
     }
 
-    public Task(String name, boolean incomingItem, boolean outcomingItem, Point position) {
+    public Task(String name, boolean incomingItem, boolean outcomingItem, List<Point> position) {
         this.name = name;
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
-        this.finalPosition = position;
+        this.relatedPositions = position;
     }
 
-    public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem, Point position){
+    public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem, List<Point>  position){
         this.name = name;
         this.dependentTasks = new ArrayList<>();
         dependentTasks.add(dependentTask);
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
-        this.finalPosition = position;
+        this.relatedPositions = position;
     }
 
-    public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem, Point position){
+    public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem, List<Point>  position){
         this.name = name;
         this.dependentTasks = dependentTasks;
         this.incomingItem = incomingItem;
         this.outcomingItem = outcomingItem;
-        this.finalPosition = position;
+        this.relatedPositions = position;
     }
 
     public Point getLastPosition() {
@@ -75,10 +84,8 @@ public class Task extends TaskOrCharacter {
             return getCharacter().getLocation();
         }
     }
-    public Point getPosition() { return finalPosition; }
+    public Point getPosition() { return relatedPositions.get(positionIndex); }
 
-    public void setPosition(Point p){ this.finalPosition = p; }
-    public String getLocationType(){return locationType; }
 
     public String getName() {
         return name;
@@ -88,11 +95,15 @@ public class Task extends TaskOrCharacter {
         return previousElement;
     }
 
+
     public Task getPreviousTask() {
         if(getPreviousElement() instanceof Task) {
             return (Task) getPreviousElement();
         }
         return null;
+    }
+    public Integer getPreviousTaskId() {
+        return getPreviousTask() == null ? null : getPreviousTask().id;
     }
 
     public Character getCharacter() {

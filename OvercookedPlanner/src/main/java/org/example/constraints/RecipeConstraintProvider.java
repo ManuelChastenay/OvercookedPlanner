@@ -5,10 +5,7 @@ import org.example.domain.actions.Task;
 import org.example.utils.Pathfinding;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
-import org.optaplanner.core.api.score.stream.Constraint;
-import org.optaplanner.core.api.score.stream.ConstraintFactory;
-import org.optaplanner.core.api.score.stream.ConstraintProvider;
-import org.optaplanner.core.api.score.stream.Joiners;
+import org.optaplanner.core.api.score.stream.*;
 
 import java.util.Objects;
 
@@ -28,7 +25,8 @@ public class RecipeConstraintProvider implements ConstraintProvider {
 
                 //Soft constraints
                 penalizeChracterDoingNothing(constraintFactory),
-                minimizeDistanceFromTaskToNext(constraintFactory)
+                minimizeDistanceFromTaskToNext(constraintFactory),
+
         };
     }
 
@@ -80,18 +78,10 @@ public class RecipeConstraintProvider implements ConstraintProvider {
     private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
+                .join(Task.class, Joiners.equal(Task::getPreviousTaskId, Task::getId))
                 .penalizeLong(
                         HardSoftLongScore.ONE_SOFT, // Le poids de la pénalité.
-                        (currentTask) -> Pathfinding.calculateDistance(currentTask) // La fonction de pénalité.
+                        (currentTask, previousTask) -> Pathfinding.calculateDistance(currentTask,previousTask ) // La fonction de pénalité.
                 ).asConstraint("motion penalty");
-    }
-
-    //TODO: Corriger la contrainte, elle n'est pas complètement fonctionnelle.
-    private Constraint cantHoldMoreThanOneItem(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEach(Task.class)
-                .filter(task -> !task.isItemInHandValid())
-                .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1) -> 1L).asConstraint("Holding More Than One Item");
     }
 }

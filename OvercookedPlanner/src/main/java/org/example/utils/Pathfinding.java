@@ -5,6 +5,7 @@ import org.example.domain.actions.Task;
 import org.example.domain.grid.Grid;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 
+import javax.swing.*;
 import java.awt.geom.PathIterator;
 import java.util.*;
 import java.awt.Point;
@@ -16,7 +17,7 @@ public class Pathfinding {
     private static Grid grid;
     private static Map<String, List<Point>> linkedSpecialPlaces = new HashMap<String, List<Point>>();
 
-    public static long calculateDistance(Task t){
+    public static long calculateDistance(Task t, Task pt){
         Point lastPoint = t.getLastPosition();
         Pair<Double, List<Point>> newPath = aStar(lastPoint, t.getPosition());
         return newPath.a.longValue();
