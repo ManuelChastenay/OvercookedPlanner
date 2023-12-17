@@ -37,8 +37,8 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .join(Task.class,
                         Joiners.lessThan(Task::getId))
                 .filter((t1, t2) ->
-                        (t2.getDependencies().contains(t1) && !(t2.getPreviousTasks().contains(t1) || t2.getRecipePreviousTasks().contains(t1))) ||
-                        (t1.getDependencies().contains(t2) && !(t1.getPreviousTasks().contains(t2) || t1.getRecipePreviousTasks().contains(t2)))
+                        (t2.getDependencies().contains(t1) && !t2.getRecipePreviousTasks().contains(t1)) ||
+                        (t1.getDependencies().contains(t2) && !t1.getRecipePreviousTasks().contains(t2))
                 )
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
                         (t1, t2) -> 500L).asConstraint("Task Dependencies Requires");

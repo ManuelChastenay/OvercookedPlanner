@@ -3,7 +3,9 @@ package org.example.domain;
 import org.example.domain.actions.Task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Recipe {
     private String recipeName;
@@ -22,12 +24,26 @@ public class Recipe {
         return tasks;
     }
 
-    public List<Task> getEndedTasks(int startTime){
-        List<Task> endedTasks = new ArrayList<>();
+    public List<Task> getOtherPreviousTasks(Character character, int startTime){
+        Map<Character, Task> otherEndedTasks = new HashMap<>();
         for(Task task : tasks){
-            if(task.getStartTime() + task.getDuration() < startTime) endedTasks.add(task);
+            if(task.getCharacter() != character && (
+                    otherEndedTasks.get(task.getCharacter()) == null ||
+                            //TODO à vérifier
+                            (otherEndedTasks.get(task.getCharacter()).getStartTime() < task.getStartTime() &&
+                            task.getStartTime() + task.getDuration() < startTime)
+            )){
+                otherEndedTasks.put(task.getCharacter(), task);
+            }
         }
-        return endedTasks;
+
+        List<Task> otherPreviousTasks = new ArrayList<>();
+        for(Map.Entry<Character, Task> entry : otherEndedTasks.entrySet()){
+            otherPreviousTasks.addAll(entry.getValue().getPreviousTasks());
+            otherPreviousTasks.add(entry.getValue());
+        }
+
+        return otherPreviousTasks;
     }
 
     public void setTasks(List<Task> tasks) {
