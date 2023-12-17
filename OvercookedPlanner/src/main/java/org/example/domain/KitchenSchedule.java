@@ -25,6 +25,7 @@ public class KitchenSchedule {
     private List<Task> taskList;
 
     @ValueRangeProvider(id = "startTime")
+    //TODO à modifier.
     public CountableValueRange<Integer> getFinishedOrder() {
         return ValueRangeFactory.createIntValueRange(0, taskList.size());
     }
