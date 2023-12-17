@@ -30,4 +30,8 @@ public class Recipe {
             task.setId(id++);
         }
     }
+
+    public Integer getStartTime(){
+        return recipeStartTime;
+    }
 }

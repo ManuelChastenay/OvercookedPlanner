@@ -16,8 +16,8 @@ public class RecipeRepository {
     }
 
     private void createRepository(){
-        this.addOnionSoup(1);
-        this.addBrocoliSoup(5);
+        this.addOnionSoup(0);
+        //this.addBrocoliSoup(5);
     }
 
     public List<Recipe> getRecipes(List<String> recipesToFetch){
@@ -34,35 +34,35 @@ public class RecipeRepository {
         Recipe onionSoup = new Recipe(ONION_SOUP_RECIPE, startTime);
 
         Item onion = new Item("\uD83E\uDDC5");
-        Task takeOnionTask1 = new Task("Take onion", null, onion);
-        Task takeOnionTask2 = new Task("Take onion", null, onion);
+        Task takeOnionTask1 = new Task("Take onion", null, onion, 1);
+        Task takeOnionTask2 = new Task("Take onion", null, onion, 1);
         taskList.add(takeOnionTask1);
         taskList.add(takeOnionTask2);
 
         //Pour l'instant, on coupe l'objet dans les mains et le le reprends, on ne s'en discossie pas vraiment
         Item onionCut = new Item("\uD83E\uDDC5\uD83D\uDD2A");
-        Task cutOnionTask1 = new Task("Cut onion", onion, onionCut);
-        Task cutOnionTask2 = new Task("Cut onion", onion, onionCut);
+        Task cutOnionTask1 = new Task("Cut onion", onion, onionCut, 10);
+        Task cutOnionTask2 = new Task("Cut onion", onion, onionCut, 10);
         taskList.add(cutOnionTask1);
         taskList.add(cutOnionTask2);
 
-        Task placeOnionInPotTask1 = new Task("Place onion in pot", onionCut, null);
-        Task placeOnionInPotTask2 = new Task("Place onion in pot", onionCut, null);
+        Task placeOnionInPotTask1 = new Task("Place onion in pot", onionCut, null, 1);
+        Task placeOnionInPotTask2 = new Task("Place onion in pot", onionCut, null, 1);
         taskList.add(placeOnionInPotTask1);
         taskList.add(placeOnionInPotTask2);
 
         Item bowl = new Item("\uD83E\uDD63");
-        Task takeBowlTask = new Task("Take bowl", null, bowl);
+        List<Task> takeBowlDependencies = new ArrayList<>();
+        takeBowlDependencies.add(placeOnionInPotTask1);
+        takeBowlDependencies.add(placeOnionInPotTask2);
+        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, null, bowl, 1);
         taskList.add(takeBowlTask);
 
         Item onionSoupBowl = new Item("\uD83E\uDD63\uD83E\uDDC5");
-        List<Task> takeSoupDependencies = new ArrayList<>();
-        takeSoupDependencies.add(placeOnionInPotTask1);
-        takeSoupDependencies.add(placeOnionInPotTask2);
-        Task putSoupTask = new Task("Put onion soup in bowl", takeSoupDependencies, bowl, onionSoupBowl);
+        Task putSoupTask = new Task("Put onion soup in bowl", takeBowlTask, bowl, onionSoupBowl, 5);
         taskList.add(putSoupTask);
 
-        Task serveSoupTask = new Task("Serve onion soup", onionSoupBowl, null);
+        Task serveSoupTask = new Task("Serve onion soup", onionSoupBowl, null, 1);
         taskList.add(serveSoupTask);
 
         // Random order to full test the solution
@@ -73,7 +73,7 @@ public class RecipeRepository {
     }
 
     // Ajout d'une seconde recette pour l'ordonnancement
-    private void addBrocoliSoup(Integer startTime){
+    /*private void addBrocoliSoup(Integer startTime){
         List<Task> taskList = new ArrayList<>();
 
         Recipe brocoliSoup = new Recipe(BROCOLI_SOUP_RECIPE, startTime);
@@ -113,5 +113,5 @@ public class RecipeRepository {
 
         brocoliSoup.setTasks(taskList);
         repository.put(BROCOLI_SOUP_RECIPE, brocoliSoup);
-    }
+    }*/
 }

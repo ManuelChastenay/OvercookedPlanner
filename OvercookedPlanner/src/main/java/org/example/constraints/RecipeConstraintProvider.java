@@ -15,9 +15,10 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         return new Constraint[]{
                 //Hard constraints
                 penalizeUnfinishedTaskRequirements(constraintFactory),
-                //penalizeDependenciesOrderTaskDependency(constraintFactory),
+                penalizeIncorrectStartTime(constraintFactory),
                 cantDoActionWithoutNeededItem(constraintFactory),
                 cantOutputItemWhenAlreadyHaveItemNotUsed(constraintFactory),
+                firstActionHasBaseStartTime(constraintFactory),
                 firstActionCantHaveDependencies(constraintFactory),
                 firstActionCantRequireItem(constraintFactory),
 
@@ -41,20 +42,20 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                         (t1.getDependencies().contains(t2) && !t1.getPreviousTasks().contains(t2))
                 )
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1, t2) -> 50L).asConstraint("Task Dependencies Requires");
+                        (t1, t2) -> 500L).asConstraint("Task Dependencies Requires");
                         //TODO Meilleure gestion des poids
                         //(t1, t2) -> (long) t1.getUnfinishedDependencies().size()).asConstraint("Task Dependencies Requires");
     }
 
-    //Poids très faible pour le moment de début (débutr tâche précédente + temps d'éxécution tâche précédente)
-    private Constraint penalizeDependenciesOrderTaskDependency(ConstraintFactory constraintFactory) {
+    private Constraint penalizeIncorrectStartTime(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
                 .join(Task.class,
-                        Joiners.equal(Task::getCharacter))
-                .filter((t1, t2) -> t1.getPreviousTasks().contains(t2) && t1.getStartTime() <= t2.getStartTime())
+                        //Joiners.equal(Task::getCharacter),
+                        Joiners.equal(Task::getPreviousTaskId, Task::getId))
+                .filter((task, previousTask) -> task.getStartTime() != previousTask.getStartTime() + previousTask.getDuration())
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1, t2) -> 1L).asConstraint("Dependencies Have Lower Task Order");
+                        (t1, t2) -> 1L).asConstraint("Incorrect Start Time Set");
     }
 
     private Constraint cantDoActionWithoutNeededItem(ConstraintFactory constraintFactory) {
@@ -64,7 +65,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                         Joiners.equal(Task::getPreviousTaskId, Task::getId))
                 .filter((task, previousTask) -> task.getInputItem() != null && task.getInputItem() != previousTask.getOutputItem())
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1 , t2) -> 100L).asConstraint("Starting task without needed item");
+                        (t1, t2) -> 200L).asConstraint("Starting task without needed item");
     }
 
     private Constraint cantOutputItemWhenAlreadyHaveItemNotUsed(ConstraintFactory constraintFactory) {
@@ -75,6 +76,14 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .filter((task, previousTask) -> task.getOutputItem() != null && task.getInputItem() == null && previousTask.getOutputItem() != null)
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
                         (t1 , t2) -> 100L).asConstraint("Can't take more than one item");
+    }
+
+    private Constraint firstActionHasBaseStartTime(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .filter(t -> t.getPreviousTask() == null && t.getStartTime() != 0)
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        t -> 1000L).asConstraint("First action has to start at time 0");
     }
 
     private Constraint firstActionCantRequireItem(ConstraintFactory constraintFactory) {

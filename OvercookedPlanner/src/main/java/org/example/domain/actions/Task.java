@@ -3,6 +3,9 @@ package org.example.domain.actions;
 import org.example.domain.Character;
 import org.example.domain.Recipe;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
+import org.optaplanner.core.api.domain.valuerange.ValueRange;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
+import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
@@ -14,7 +17,9 @@ import java.util.List;
 @PlanningEntity
 public class Task extends TaskOrCharacter {
     private String name;
+
     private int id;
+    private int duration = 1;
     private Recipe currentRecipe;
     private List<Task> dependentTasks;
 
@@ -33,29 +38,45 @@ public class Task extends TaskOrCharacter {
     @PlanningVariable(valueRangeProviderRefs = {"startTime"})
     private Integer startTime;
 
+    @ValueRangeProvider(id = "startTime")
+    public List<Integer> getStartTimeValueRange() {
+        List<Integer> possibleValue = new ArrayList<>();
+
+
+        if(getPreviousTask() != null) possibleValue.add(getPreviousTask().startTime + getPreviousTask().duration);
+        else possibleValue.add(0);
+        //Having more than 1 variable helps the planner not crashing.
+        //possibleValue.add(0);
+
+        return possibleValue;
+    }
+
     public Task(){
 
     }
 
-    public Task(String name, Item inputItem, Item outputItem) {
+    public Task(String name, Item inputItem, Item outputItem, int duration) {
         this.name = name;
         this.inputItem = inputItem;
         this.outputItem = outputItem;
+        this.duration = duration;
     }
 
-    public Task(String name, Task dependentTask, Item inputItem, Item outputItem){
+    public Task(String name, Task dependentTask, Item inputItem, Item outputItem, int duration){
         this.name = name;
         this.dependentTasks = new ArrayList<>();
         dependentTasks.add(dependentTask);
         this.inputItem = inputItem;
         this.outputItem = outputItem;
+        this.duration = duration;
     }
 
-    public Task(String name, List<Task> dependentTasks, Item inputItem, Item outputItem){
+    public Task(String name, List<Task> dependentTasks, Item inputItem, Item outputItem, int duration){
         this.name = name;
         this.dependentTasks = dependentTasks;
         this.inputItem = inputItem;
         this.outputItem = outputItem;
+        this.duration = duration;
     }
 
     public String getName() {
@@ -105,7 +126,10 @@ public class Task extends TaskOrCharacter {
         return startTime == null ? 0 : startTime;
     }
 
-    //TODO Degueu mais fonctionnel
+    public int getDuration(){
+        return duration;
+    }
+
     public List<Task> getPreviousTasks(){
         List<Task> previousTasks = new ArrayList<>();
         if(previousElement instanceof Character) return previousTasks;
