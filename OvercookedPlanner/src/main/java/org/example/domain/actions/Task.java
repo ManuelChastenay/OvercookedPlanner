@@ -18,15 +18,16 @@ public class Task extends TaskOrCharacter {
     private Recipe currentRecipe;
     private List<Task> dependentTasks;
 
+    private Item inputItem;
+
+    private Item outputItem;
+
     @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrCharacter previousElement;
 
     @AnchorShadowVariable(sourceVariableName = PREVIOUS_ELEMENT)
     private Character character;
-
-    private Boolean incomingItem; //True si la tâche fais passer le character de main vides à main pleines, false sinon.
-    private Boolean outcomingItem; //True si la tâche fais passer le character de main pleines à main vides, false sinon.
-
+    
     //ValueRangeProvider se trouve dans la classe Recipe, pour avoir accès au nombre de tasks.
     //TODO: Modifier lors de l'implémentation du temps pour l'ordonnancement
     @PlanningVariable(valueRangeProviderRefs = {"startTime"})
@@ -36,25 +37,25 @@ public class Task extends TaskOrCharacter {
 
     }
 
-    public Task(String name, boolean incomingItem, boolean outcomingItem) {
+    public Task(String name, Item inputItem, Item outputItem) {
         this.name = name;
-        this.incomingItem = incomingItem;
-        this.outcomingItem = outcomingItem;
+        this.inputItem = inputItem;
+        this.outputItem = outputItem;
     }
 
-    public Task(String name, Task dependentTask, boolean incomingItem, boolean outcomingItem){
+    public Task(String name, Task dependentTask, Item inputItem, Item outputItem){
         this.name = name;
         this.dependentTasks = new ArrayList<>();
         dependentTasks.add(dependentTask);
-        this.incomingItem = incomingItem;
-        this.outcomingItem = outcomingItem;
+        this.inputItem = inputItem;
+        this.outputItem = outputItem;
     }
 
-    public Task(String name, List<Task> dependentTasks, boolean incomingItem, boolean outcomingItem){
+    public Task(String name, List<Task> dependentTasks, Item inputItem, Item outputItem){
         this.name = name;
         this.dependentTasks = dependentTasks;
-        this.incomingItem = incomingItem;
-        this.outcomingItem = outcomingItem;
+        this.inputItem = inputItem;
+        this.outputItem = outputItem;
     }
 
     public String getName() {
@@ -118,11 +119,11 @@ public class Task extends TaskOrCharacter {
         return previousTasks;
     }
 
-    public Boolean hasIncoming() {
-        return incomingItem;
+    public Item getInputItem() {
+        return inputItem;
     }
 
-    public Boolean hasOutcoming() {
-        return outcomingItem;
+    public Item getOutputItem() {
+        return outputItem;
     }
 }

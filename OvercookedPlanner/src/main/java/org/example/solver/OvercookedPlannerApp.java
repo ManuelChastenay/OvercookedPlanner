@@ -53,7 +53,7 @@ public class OvercookedPlannerApp {
         List<Recipe> recipes = repository.getRecipes(recipesToFetch);
         List<Task> tasks = new ArrayList<>();
         recipes.forEach(recipe -> tasks.addAll(recipe.getTasks()));
-        //tasks.add(new Task("dumb task 1", false, false));
+        //tasks.add(new Task("dumb task 1", null, null));
         //tasks.add(new Task("dumb task 2", tasks.getLast(), false, false));
         //tasks.add(new Task("dumb task 3", null, false, false));
         //tasks.add(new Task("dumb task 4", null, false, false));
@@ -73,8 +73,8 @@ public class OvercookedPlannerApp {
             LOGGER.info(("Character " + character.getId()));
             Task task = character.getNextElement();
             while(task != null) {
-                LOGGER.info(task.getName() + (task.hasOutcoming() ? " ✋" : ""));
-                task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
+                LOGGER.info(task.getName() + (task.getOutputItem() != null ? " ✋(" + task.getOutputItem().getName() + ")" : ""));
+                //task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
                 LOGGER.info(String.valueOf(task.getStartTime()));
                 LOGGER.info(" ");
                 //LOGGER.info("Task order: " + task.getStartTime());

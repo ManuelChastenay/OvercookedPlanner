@@ -19,13 +19,15 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 //Manu: Vous pouvez commenter cette contrainte si vous ne travaillez pas sur le multijouer
                 //Adam, tu peux partir de ça pour les poids plus tard quand tu vas être rendu là (Sauvegarde des paths dans les characters)
                 //Avoir un eventlistener qui gère les valeurs de startTime serait mieux qu'avoir le solveur qui s'en occuppe.
-                penalizeDependenciesOrderTaskDependency(constraintFactory),
+                //penalizeDependenciesOrderTaskDependency(constraintFactory),
 
+                firstActionCantHaveDependencies(constraintFactory),
+                firstActionCantRequireItem(constraintFactory),
                 cantDoActionWithoutNeededItem(constraintFactory),
                 cantOutputItemWhenAlreadyHaveItemNotUsed(constraintFactory),
 
                 //Soft constraints
-                //penalizeCharacterDoingNothing(constraintFactory)
+                penalizeCharacterDoingNothing(constraintFactory)
         };
     }
 
@@ -41,7 +43,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                                 (t1.getDependencies().contains(t2) && !t1.getPreviousTasks().contains(t2))
                 )
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1, t2) -> 1L).asConstraint("Task Dependencies Requires");
+                        (t1, t2) -> 100L).asConstraint("Task Dependencies Requires");
         //TODO Meilleure gestion des poids
         //(t1, t2) -> (long) t1.getUnfinishedDependencies().size()).asConstraint("Task Dependencies Requires");
     }
@@ -55,16 +57,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .filter((t1, t2) -> t1.getPreviousTasks().contains(t2) && t1.getStartTime() <= t2.getStartTime())
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
                         //Manu: Je sais pas pourquoi, mais un gros poids accélère vraiment la convergence ici
-                        (t1, t2) -> 100L).asConstraint("Dependencies Have Lower Task Order");
-    }
-
-    //TODO: Minimiser le temps total (Non fonctionnel)
-    private Constraint minimizeTotalAmountOfTask(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEachUniquePair(Character.class)
-                //.forEach(CharacterSchedule.class)
-                //.filter(s -> s.getTaskAmount() == 0)
-                .penalize(HardSoftScore.ONE_SOFT/*, (schedule1, schedule2) -> Math.abs(schedule1.getTaskAmount() - schedule2.getTaskAmount())*/).asConstraint("Minimize Step amount");
+                        (t1, t2) -> 10L).asConstraint("Dependencies Have Lower Task Order");
     }
 
     private Constraint penalizeCharacterDoingNothing(ConstraintFactory constraintFactory) {
@@ -80,9 +73,9 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .forEach(Task.class)
                 .join(Task.class,
                         Joiners.equal(Task::getPreviousTaskId, Task::getId))
-                .filter((task, previousTask) -> task.hasIncoming() && !previousTask.hasOutcoming())
+                .filter((task, previousTask) -> task.getInputItem() != null && task.getInputItem() != previousTask.getOutputItem())
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1 , t2) -> 10L).asConstraint("Starting task without needed item");
+                        (t1 , t2) -> 101L).asConstraint("Starting task without needed item");
     }
 
     private Constraint cantOutputItemWhenAlreadyHaveItemNotUsed(ConstraintFactory constraintFactory) {
@@ -90,8 +83,24 @@ public class RecipeConstraintProvider implements ConstraintProvider {
                 .forEach(Task.class)
                 .join(Task.class,
                         Joiners.equal(Task::getPreviousTaskId, Task::getId))
-                .filter((task, previousTask) -> task.hasOutcoming() && !task.hasIncoming() && previousTask.hasOutcoming())
+                .filter((task, previousTask) -> task.getOutputItem() != null && task.getInputItem() == null && previousTask.getOutputItem() != null)
                 .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1 , t2) -> 10L).asConstraint("Can't take more than one item");
+                        (t1 , t2) -> 100L).asConstraint("Can't take more than one item");
+    }
+
+    private Constraint firstActionCantRequireItem(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .filter(t -> t.getPreviousTask() == null && t.getInputItem() != null)
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        t -> 1000L).asConstraint("First action can't require an item");
+    }
+
+    private Constraint firstActionCantHaveDependencies(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                .forEach(Task.class)
+                .filter(t -> t.getPreviousTask() == null && !t.getDependencies().isEmpty())
+                .penalizeLong(HardSoftLongScore.ONE_HARD,
+                        t -> 1000L).asConstraint("First action can't have dependencies");
     }
 }
