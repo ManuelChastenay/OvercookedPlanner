@@ -2,12 +2,13 @@
 <configuration>
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5p : %m %n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5p : %m %n</pattern>0.
+            3
         </encoder>
     </appender>
 
     <!-- Niveau de log durant la résolution -->
-    <logger name="org.optaplanner" level="debug"/>
+    <logger name="org.optaplanner" level="trace"/>
 
     <!-- Niveau de log de la réponse -->
     <root level="info">

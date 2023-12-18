@@ -52,7 +52,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
         return constraintFactory
             .forEach(Task.class)
             .filter(task -> task.getStartTime() < task.getCurrentRecipe().getStartTime())
-            .penalizeLong(HardSoftLongScore.ONE_HARD, task -> 1L).asConstraint("Incorrect Recipe Start Time Set");
+            .penalizeLong(HardSoftLongScore.ONE_HARD, task -> 1000L).asConstraint("Incorrect Recipe Start Time Set");
     }
 
     private Constraint cantDoActionWithoutNeededItem(ConstraintFactory constraintFactory) {

@@ -17,7 +17,7 @@ public class RecipeRepository {
 
     private void createRepository(){
         this.addOnionSoup(0);
-        this.addBrocoliSoup(15);
+        this.addBrocoliSoup(0);
     }
 
     public List<Recipe> getRecipes(List<String> recipesToFetch){
