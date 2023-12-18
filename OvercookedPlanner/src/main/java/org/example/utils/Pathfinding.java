@@ -3,10 +3,6 @@ package org.example.utils;
 import com.github.javaparser.utils.Pair;
 import org.example.domain.actions.Task;
 import org.example.domain.grid.Grid;
-import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
-
-import javax.swing.*;
-import java.awt.geom.PathIterator;
 import java.util.*;
 import java.awt.Point;
 
@@ -53,7 +49,7 @@ public class Pathfinding {
             }
         }
 
-        return new Pair<Double, List<Point>>(Double.MAX_VALUE, new ArrayList<>());
+        return new Pair<Double, List<Point>>(5000D, new ArrayList<>());
     }
 
     private static List<Point> getNeighbors(Point current){

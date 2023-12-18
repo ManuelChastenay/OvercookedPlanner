@@ -74,19 +74,19 @@ public class RecipeRepository {
         Recipe brocoliSoup = new Recipe(BROCOLI_SOUP_RECIPE, startTime);
 
         Item brocoli = new Item("\uD83E\uDD66");
-        Task takeBrocoliTask1 = new Task("Take brocoli", null, brocoli, 1);
-        Task takeBrocoliTask2 = new Task("Take brocoli", null, brocoli, 1);
+        Task takeBrocoliTask1 = new Task("Take brocoli", null, brocoli, 1, Pathfinding.getRelatedPositionsOf("🥦"));
+        Task takeBrocoliTask2 = new Task("Take brocoli", null, brocoli, 1, Pathfinding.getRelatedPositionsOf("🥦"));
         taskList.add(takeBrocoliTask1);
         taskList.add(takeBrocoliTask2);
 
         Item brocoliCut = new Item("\uD83E\uDD66\uD83D\uDD2A");
-        Task cutBrocoliTask1 = new Task("Cut brocoli", takeBrocoliTask1, brocoli, brocoliCut, 15);
-        Task cutBrocoliTask2 = new Task("Cut brocoli", takeBrocoliTask2, brocoli, brocoliCut, 15);
+        Task cutBrocoliTask1 = new Task("Cut brocoli", takeBrocoliTask1, brocoli, brocoliCut, 15, Pathfinding.getRelatedPositionsOf("🔪"));
+        Task cutBrocoliTask2 = new Task("Cut brocoli", takeBrocoliTask2, brocoli, brocoliCut, 15, Pathfinding.getRelatedPositionsOf("🔪"));
         taskList.add(cutBrocoliTask1);
         taskList.add(cutBrocoliTask2);
 
-        Task placeBrocoliInPotTask1 = new Task("Place brocoli in pot", cutBrocoliTask1, brocoliCut, null, 1);
-        Task placeBrocoliInPotTask2 = new Task("Place brocoli in pot", cutBrocoliTask2, brocoliCut, null, 1);
+        Task placeBrocoliInPotTask1 = new Task("Place brocoli in pot", cutBrocoliTask1, brocoliCut, null, 1, Pathfinding.getRelatedPositionsOf("🍲"));
+        Task placeBrocoliInPotTask2 = new Task("Place brocoli in pot", cutBrocoliTask2, brocoliCut, null, 1, Pathfinding.getRelatedPositionsOf("🍲"));
         taskList.add(placeBrocoliInPotTask1);
         taskList.add(placeBrocoliInPotTask2);
 
@@ -94,7 +94,7 @@ public class RecipeRepository {
         List<Task> takeBowlDependencies = new ArrayList<>();
         takeBowlDependencies.add(placeBrocoliInPotTask1);
         takeBowlDependencies.add(placeBrocoliInPotTask2);
-        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, null, bowl, 1);
+        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, null, bowl, 1, Pathfinding.getRelatedPositionsOf("🆕"));
         taskList.add(takeBowlTask);
 
         Item brocoliSoupBowl = new Item("\uD83E\uDD63\uD83E\uDD66");

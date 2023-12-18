@@ -2,7 +2,6 @@ package org.example.constraints;
 
 import org.example.domain.actions.Task;
 import org.example.utils.Pathfinding;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.stream.*;
 
@@ -24,7 +23,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
 
 
             //Soft constraints
-            minimizeDistanceFromTaskToNext(constraintFactory),
+            //minimizeDistanceFromTaskToNext(constraintFactory),
             penalizeLenghtOfSchedule(constraintFactory)
         };
     }
@@ -44,7 +43,7 @@ public class RecipeConstraintProvider implements ConstraintProvider {
             .forEach(Task.class)
             .join(Task.class,
                 Joiners.equal(Task::getPreviousTaskId, Task::getId))
-            .filter((task, previousTask) -> task.getStartTime() != previousTask.getStartTime() + previousTask.getDuration())
+            .filter((task, previousTask) -> task.getStartTime() != previousTask.getStartTime() + previousTask.getDuration() + Pathfinding.calculateDistance(task, previousTask))
             .penalizeLong(HardSoftLongScore.ONE_HARD, (t1, t2) -> 1L).asConstraint("Incorrect Task Start Time Set");
     }
 
@@ -80,17 +79,6 @@ public class RecipeConstraintProvider implements ConstraintProvider {
             .penalizeLong(HardSoftLongScore.ONE_HARD, t -> 1000L).asConstraint("First action has to start at time 0");
     }
 
-
-    private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
-        return constraintFactory
-                .forEach(Task.class)
-                .join(Task.class, Joiners.equal(Task::getPreviousTaskId, Task::getId))
-                .penalizeLong(
-                        HardSoftLongScore.ONE_SOFT, // Le poids de la pénalité.
-                        (currentTask, previousTask) -> Pathfinding.calculateDistance(currentTask,previousTask ) // La fonction de pénalité.
-                ).asConstraint("motion penalty");
-    }
-
     private Constraint firstActionCantRequireItem(ConstraintFactory constraintFactory) {
         return constraintFactory
             .forEach(Task.class)
@@ -107,6 +95,13 @@ public class RecipeConstraintProvider implements ConstraintProvider {
 
 
     //SOFT CONSTRAINTS
+
+    private Constraint minimizeDistanceFromTaskToNext(ConstraintFactory constraintFactory) {
+        return constraintFactory
+            .forEach(Task.class)
+            .join(Task.class, Joiners.equal(Task::getPreviousTaskId, Task::getId))
+            .penalizeLong(HardSoftLongScore.ONE_SOFT, Pathfinding::calculateDistance).asConstraint("motion penalty");
+    }
 
     private Constraint penalizeLenghtOfSchedule(ConstraintFactory constraintFactory) {
         return constraintFactory

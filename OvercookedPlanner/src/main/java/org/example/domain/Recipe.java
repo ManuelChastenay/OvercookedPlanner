@@ -24,7 +24,7 @@ public class Recipe {
         return tasks;
     }
 
-    public List<Task> getAllPreviousTasks(int startTime){
+    public List<Task> getAllPreviousTasks(Long startTime){
         Map<Character, Task> lastEndedTasks = new HashMap<>();
 
         for(Task task : tasks){

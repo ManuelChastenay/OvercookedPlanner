@@ -5,8 +5,6 @@ import org.example.domain.*;
 import org.example.domain.Character;
 import org.example.domain.actions.Task;
 import org.example.domain.actions.TaskOrCharacter;
-import org.example.domain.grid.Grid;
-import org.example.utils.Pathfinding;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.optaplanner.core.config.solver.EnvironmentMode;
@@ -15,27 +13,23 @@ import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class OvercookedPlannerApp {
     private static final Logger LOGGER = LoggerFactory.getLogger(OvercookedPlannerApp.class);
 
-    public static void plan(Grid grid) {
+    public static void plan() {
         SolverFactory<KitchenSchedule> solverFactory = SolverFactory.create(new SolverConfig()
                 .withEnvironmentMode(EnvironmentMode.FULL_ASSERT)
                 .withSolutionClass(KitchenSchedule.class)
                 .withEntityClasses(Task.class, TaskOrCharacter.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(15L))
+                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(5L))
         );
 
         // Load the problem
-        // TODO: Ajouter une classe comme Menu pour regrouper un collection de recettes.
         KitchenSchedule problem = generateDemoData();
-
 
         // Solve the problem
         Solver<KitchenSchedule> solver = solverFactory.buildSolver();
@@ -52,7 +46,7 @@ public class OvercookedPlannerApp {
 
         List<String> recipesToFetch = new ArrayList<>();
         recipesToFetch.add(RecipeRepository.ONION_SOUP_RECIPE);
-        //recipesToFetch.add(RecipeRepository.BROCOLI_SOUP_RECIPE);
+        //recipesToFetch.add(RecipeRepository.BROCCOLI_SOUP_RECIPE);
 
         RecipeRepository repository = new RecipeRepository();
         List<Recipe> recipes = repository.getRecipes(recipesToFetch);
@@ -70,9 +64,9 @@ public class OvercookedPlannerApp {
             LOGGER.info(("Character " + character.getId()));
             Task task = character.getNextElement();
             while(task != null) {
-                LOGGER.info(task.getName() + (task.getOutputItem() != null ? " ✋(" + task.getOutputItem().getName() + ")" : ""));
-                LOGGER.info(String.valueOf(task.getStartTime()));
-                LOGGER.info(" "+ task.getPosition().toString());
+                LOGGER.info("  StartTime: " + task.getStartTime());
+                LOGGER.info("  " + task.getName() + (task.getOutputItem() != null ? " ✋(" + task.getOutputItem().getName() + ")" : "") + ", Duration: " + task.getDuration());
+                LOGGER.info("  Position: { x = " + task.getPosition().x + ", y = " + task.getPosition().y + " }");
                 LOGGER.info(" ");
                 task = task.getNextElement();
             }

@@ -1,11 +1,9 @@
 package org.example.domain.actions;
 
-import com.github.javaparser.utils.Pair;
 import org.example.domain.Character;
 import org.example.domain.Recipe;
+import org.example.utils.Pathfinding;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.valuerange.ValueRange;
-import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -26,8 +24,6 @@ public class Task extends TaskOrCharacter {
     private Recipe currentRecipe;
     private List<Task> dependentTasks;
 
-
-
     private  List<Point> relatedPositions;
 
     @PlanningVariable(valueRangeProviderRefs = "positionRange")
@@ -37,35 +33,26 @@ public class Task extends TaskOrCharacter {
 
     private Item outputItem;
 
-
     @PlanningVariable(graphType = PlanningVariableGraphType.CHAINED)
     private TaskOrCharacter previousElement;
 
     @AnchorShadowVariable(sourceVariableName = PREVIOUS_ELEMENT)
     private Character character;
 
-
     @PlanningVariable(valueRangeProviderRefs = {"startTime"})
-    private Integer startTime;
+    private Long startTime;
 
     @ValueRangeProvider(id = "positionRange")
     public List<Integer> getPositionIndexRange() {
         return IntStream.range(0, this.relatedPositions.size()).boxed().collect(Collectors.toList());
     }
 
-    private Boolean incomingItem; //True si la tâche fais passer le character de main vides à main pleines, false sinon.
-    private Boolean outcomingItem; //True si la tâche fais passer le character de main pleines à main vides, false sinon.
-
-    //ValueRangeProvider se trouve dans la classe Recipe, pour avoir accès au nombre de tasks.
-    //TODO: Modifier lors de l'implémentation du temps pour l'ordonnancement
-
-
     @ValueRangeProvider(id = "startTime")
-    public List<Integer> getStartTimeValueRange() {
-        List<Integer> possibleValue = new ArrayList<>();
+    public List<Long> getStartTimeValueRange() {
+        List<Long> possibleValue = new ArrayList<>();
 
-        if(getPreviousTask() != null) possibleValue.add(getPreviousTask().startTime + getPreviousTask().duration);
-        else possibleValue.add(0);
+        if(getPreviousTask() != null) possibleValue.add(getPreviousTask().startTime + getPreviousTask().duration + Pathfinding.calculateDistance(this, getPreviousTask()));
+        else possibleValue.add(0L);
 
         return possibleValue;
     }
@@ -118,7 +105,6 @@ public class Task extends TaskOrCharacter {
         return previousElement;
     }
 
-
     public Task getPreviousTask() {
         if(getPreviousElement() instanceof Task) {
             return (Task) getPreviousElement();
@@ -129,7 +115,6 @@ public class Task extends TaskOrCharacter {
     public Integer getPreviousTaskId() {
         return getPreviousTask() == null ? null : getPreviousTask().id;
     }
-
 
     public Character getCharacter() {
         return character;
@@ -159,7 +144,7 @@ public class Task extends TaskOrCharacter {
         return dependencies;
     }
 
-    public Integer getStartTime(){
+    public Long getStartTime(){
         return startTime == null ? 0 : startTime;
     }
 
