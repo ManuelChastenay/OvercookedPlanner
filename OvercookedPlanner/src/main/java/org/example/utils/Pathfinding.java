@@ -65,7 +65,9 @@ public class Pathfinding {
                     int newY = current.y + j;
 
                     if(isValid(newX, newY, grid.getGrid())){
-                        neighbors.add(new Point(newX, newY));
+                        if(grid.getGrid()[newY][newX].equals('O')){
+                            neighbors.add(new Point(newX, newY));
+                        }
                     }
                 }
             }
