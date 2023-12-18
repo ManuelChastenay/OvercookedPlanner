@@ -4,10 +4,8 @@ import com.github.javaparser.utils.Pair;
 import org.example.domain.Character;
 import org.example.domain.Recipe;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
-
 import org.optaplanner.core.api.domain.valuerange.ValueRange;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory;
-
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.domain.variable.AnchorShadowVariable;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
@@ -66,11 +64,8 @@ public class Task extends TaskOrCharacter {
     public List<Integer> getStartTimeValueRange() {
         List<Integer> possibleValue = new ArrayList<>();
 
-
         if(getPreviousTask() != null) possibleValue.add(getPreviousTask().startTime + getPreviousTask().duration);
         else possibleValue.add(0);
-        //Having more than 1 variable helps the planner not crashing.
-        //possibleValue.add(0);
 
         return possibleValue;
     }
@@ -152,6 +147,10 @@ public class Task extends TaskOrCharacter {
         this.currentRecipe = currentRecipe;
     }
 
+    public Recipe getCurrentRecipe(){
+        return currentRecipe;
+    }
+
     public List<Task> getDependencies() {
         List<Task> dependencies = dependentTasks;
         if(dependentTasks == null) {
@@ -187,5 +186,17 @@ public class Task extends TaskOrCharacter {
 
     public Item getOutputItem() {
         return outputItem;
+    }
+
+    public List<Task> getRecipePreviousTasks(){
+        return currentRecipe.getAllPreviousTasks(startTime);
+    }
+
+    public boolean taskInDependenciesAndNotCompleted() {
+        List<Task> previousTasks = getRecipePreviousTasks();
+        for (Task task : getDependencies()){
+            if(previousTasks.contains(task)) return true;
+        }
+        return false;
     }
 }

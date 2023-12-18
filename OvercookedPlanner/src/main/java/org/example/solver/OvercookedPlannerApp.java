@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class OvercookedPlannerApp {
@@ -28,7 +29,7 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(KitchenSchedule.class)
                 .withEntityClasses(Task.class, TaskOrCharacter.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationConfig(new TerminationConfig().withBestScoreLimit("0hard/0soft").withSecondsSpentLimit(20L))
+                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(15L))
         );
 
         // Load the problem
@@ -47,7 +48,7 @@ public class OvercookedPlannerApp {
     public static KitchenSchedule generateDemoData() {
         List<Character> characters = new ArrayList<>();
         characters.add(new Character("0"));
-        //characters.add(new Character("1"));
+        characters.add(new Character("1"));
 
         List<String> recipesToFetch = new ArrayList<>();
         recipesToFetch.add(RecipeRepository.ONION_SOUP_RECIPE);
@@ -57,17 +58,9 @@ public class OvercookedPlannerApp {
         List<Recipe> recipes = repository.getRecipes(recipesToFetch);
         List<Task> tasks = new ArrayList<>();
         recipes.forEach(recipe -> tasks.addAll(recipe.getTasks()));
-        //tasks.add(new Task("dumb task 1", null, null));
-        //tasks.add(new Task("dumb task 2", tasks.getLast(), false, false));
-        //tasks.add(new Task("dumb task 3", null, false, false));
-        //tasks.add(new Task("dumb task 4", null, false, false));
-        //tasks.add(new Task("dumb task 5", null, false, false));
-        //tasks.add(new Task("dumb task 6", null, false, false));
-        //tasks.add(new Task("dumb task 7", null, false, false));
-        //tasks.add(new Task("dumb task 8", null, false, false));
-        //tasks.add(new Task("dumb task 9", null, false, false));
 
-        // TODO: Retourner la liste complète une fois la classe Menu implémentée
+        //Collections.shuffle(tasks);
+
         return new KitchenSchedule(characters, tasks);
     }
 
@@ -78,11 +71,9 @@ public class OvercookedPlannerApp {
             Task task = character.getNextElement();
             while(task != null) {
                 LOGGER.info(task.getName() + (task.getOutputItem() != null ? " ✋(" + task.getOutputItem().getName() + ")" : ""));
-                //task.getDependencies().forEach(t -> LOGGER.info("DEP : " + t.getName()));
                 LOGGER.info(String.valueOf(task.getStartTime()));
                 LOGGER.info(" "+ task.getPosition().toString());
                 LOGGER.info(" ");
-                //LOGGER.info("Task order: " + task.getStartTime());
                 task = task.getNextElement();
             }
         }
