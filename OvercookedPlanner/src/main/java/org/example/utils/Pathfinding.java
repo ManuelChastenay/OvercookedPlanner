@@ -16,6 +16,7 @@ public class Pathfinding {
     public static long calculateDistance(Task t, Task pt){
         Point lastPoint = t.getLastPosition();
         Pair<Double, List<Point>> newPath = aStar(lastPoint, t.getPosition());
+        System.out.print("distance"+newPath.a.toString());
         return newPath.a.longValue();
     }
 
@@ -25,7 +26,7 @@ public class Pathfinding {
 
         // Voisins candidats aux noeuds déjà solutionnés, l'heuristique utilisé est le coût du point de départ à ce point (trouvable dans g)
         // additionné par le coût de manathan
-        PriorityQueue<Point> candidates = new PriorityQueue<Point>(Comparator.comparingDouble(p -> g.get(p) + ManathanCost(p, goal)));
+        PriorityQueue<Point> candidates = new PriorityQueue<Point>(Comparator.comparingDouble(p -> (g.get(p) + ManathanCost(p, goal))));
         candidates.add(start);
         g.put(start, 0.0);
         parents.put(start, null);
@@ -56,7 +57,7 @@ public class Pathfinding {
         List<Point> neighbors = new ArrayList<Point>();
         for(int i =-1; i<=1; i++){
             for(int j = -1; j<= 1; j++){
-                if(i != 0 && j != 0){
+                if(i != 0 || j != 0){
                     int newX = current.x + i;
                     int newY = current.y + j;
 
