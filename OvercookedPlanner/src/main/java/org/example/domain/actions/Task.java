@@ -10,7 +10,6 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableGraphType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @PlanningEntity
 public class Task extends TaskOrCharacter {
@@ -150,5 +149,13 @@ public class Task extends TaskOrCharacter {
 
     public List<Task> getRecipePreviousTasks(){
         return currentRecipe.getAllPreviousTasks(startTime);
+    }
+
+    public boolean taskInDependenciesAndNotCompleted() {
+        List<Task> previousTasks = getRecipePreviousTasks();
+        for (Task task : getDependencies()){
+            if(previousTasks.contains(task)) return true;
+        }
+        return false;
     }
 }

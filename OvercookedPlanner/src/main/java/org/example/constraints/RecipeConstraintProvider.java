@@ -34,17 +34,8 @@ public class RecipeConstraintProvider implements ConstraintProvider {
     private Constraint penalizeUnfinishedTaskRequirements(ConstraintFactory constraintFactory) {
         return constraintFactory
                 .forEach(Task.class)
-                .join(Task.class,
-                        Joiners.equal(Task::getCharacter),
-                        Joiners.lessThan(Task::getId))
-                .filter((t1, t2) ->
-                        (t2.getDependencies().contains(t1) && !t2.getRecipePreviousTasks().contains(t1)) ||
-                        (t1.getDependencies().contains(t2) && !t1.getRecipePreviousTasks().contains(t2))
-                )
-                .penalizeLong(HardSoftLongScore.ONE_HARD,
-                        (t1, t2) -> 500L).asConstraint("Task Dependencies Requires");
-                        //TODO Meilleure gestion des poids
-                        //(t1, t2) -> (long) t1.getUnfinishedDependencies().size()).asConstraint("Task Dependencies Requires");
+                .filter(Task::taskInDependenciesAndNotCompleted)
+                .penalizeLong(HardSoftLongScore.ONE_HARD, t1 -> 500L).asConstraint("Task Dependencies Requires");
     }
 
     private Constraint penalizeIncorrectStartTime(ConstraintFactory constraintFactory) {

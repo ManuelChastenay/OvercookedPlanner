@@ -29,8 +29,8 @@ public class Recipe {
 
         for(Task task : tasks){
             if(lastEndedTasks.get(task.getCharacter()) == null ||
-                (lastEndedTasks.get(task.getCharacter()).getStartTime() < task.getStartTime() &&
-                task.getStartTime() + task.getDuration() < startTime)
+                (lastEndedTasks.get(task.getCharacter()).getStartTime() <= task.getStartTime() &&
+                task.getStartTime() < startTime)
             ){
                 lastEndedTasks.put(task.getCharacter(), task);
             }

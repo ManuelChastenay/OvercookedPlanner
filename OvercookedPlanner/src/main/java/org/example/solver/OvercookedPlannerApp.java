@@ -26,7 +26,7 @@ public class OvercookedPlannerApp {
                 .withSolutionClass(KitchenSchedule.class)
                 .withEntityClasses(Task.class, TaskOrCharacter.class)
                 .withConstraintProviderClass(RecipeConstraintProvider.class)
-                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(20L))
+                .withTerminationConfig(new TerminationConfig().withSecondsSpentLimit(15L))
         );
 
         // Load the problem
