@@ -16,7 +16,7 @@ public class Pathfinding {
     public static long calculateDistance(Task t, Task pt){
         Point lastPoint = t.getLastPosition();
         Pair<Double, List<Point>> newPath = aStar(lastPoint, t.getPosition());
-        System.out.print("distance"+newPath.a.toString());
+        System.out.println(lastPoint.toString()+t.getPosition().toString()+"distance"+newPath.a.toString());
         return newPath.a.longValue();
     }
 
@@ -30,6 +30,9 @@ public class Pathfinding {
         candidates.add(start);
         g.put(start, 0.0);
         parents.put(start, null);
+        if(start.x!=goal.x||start.y != goal.y){
+            System.out.print("goo");
+        }
 
         //Tant qu'il y a des candidats,
         while(!candidates.isEmpty()){
@@ -62,7 +65,8 @@ public class Pathfinding {
                     int newY = current.y + j;
 
                     if(isValid(newX, newY, grid.getGrid())){
-                        if(grid.getGrid()[newY][newX].equals('O')){
+                        String value = grid.getGrid()[newY][newX];
+                        if(value.equals("O")){
                             neighbors.add(new Point(newX, newY));
                         }
                     }
