@@ -8,9 +8,7 @@ import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
 
 @PlanningSolution
 public class KitchenSchedule {
@@ -36,25 +34,5 @@ public class KitchenSchedule {
 
     public List<Character> getCharacterList() {
         return characterList;
-    }
-
-    public void setCharacterList(List<Character> characterList) {
-        this.characterList = characterList;
-    }
-
-    public List<Task> getTaskList() {
-        return taskList;
-    }
-
-    public void setTaskList(List<Task> taskList) {
-        this.taskList = taskList;
-    }
-
-    public HardSoftLongScore getScore() {
-        return score;
-    }
-
-    public void setScore(HardSoftLongScore score) {
-        this.score = score;
     }
 }

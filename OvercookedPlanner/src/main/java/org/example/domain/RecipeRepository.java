@@ -17,7 +17,7 @@ public class RecipeRepository {
 
     private void createRepository(){
         this.addOnionSoup(0);
-        //this.addBrocoliSoup(5);
+        this.addBrocoliSoup(15);
     }
 
     public List<Recipe> getRecipes(List<String> recipesToFetch){
@@ -30,7 +30,6 @@ public class RecipeRepository {
 
     private void addOnionSoup(Integer startTime){
         List<Task> taskList = new ArrayList<>();
-
         Recipe onionSoup = new Recipe(ONION_SOUP_RECIPE, startTime);
 
         Item onion = new Item("\uD83E\uDDC5");
@@ -39,15 +38,14 @@ public class RecipeRepository {
         taskList.add(takeOnionTask1);
         taskList.add(takeOnionTask2);
 
-        //Pour l'instant, on coupe l'objet dans les mains et le le reprends, on ne s'en discossie pas vraiment
         Item onionCut = new Item("\uD83E\uDDC5\uD83D\uDD2A");
-        Task cutOnionTask1 = new Task("Cut onion", onion, onionCut, 10);
-        Task cutOnionTask2 = new Task("Cut onion", onion, onionCut, 10);
+        Task cutOnionTask1 = new Task("Cut onion", takeOnionTask1, onion, onionCut, 10);
+        Task cutOnionTask2 = new Task("Cut onion", takeOnionTask2, onion, onionCut, 10);
         taskList.add(cutOnionTask1);
         taskList.add(cutOnionTask2);
 
-        Task placeOnionInPotTask1 = new Task("Place onion in pot", onionCut, null, 1);
-        Task placeOnionInPotTask2 = new Task("Place onion in pot", onionCut, null, 1);
+        Task placeOnionInPotTask1 = new Task("Place onion in pot", cutOnionTask1, onionCut, null, 1);
+        Task placeOnionInPotTask2 = new Task("Place onion in pot", cutOnionTask2, onionCut, null, 1);
         taskList.add(placeOnionInPotTask1);
         taskList.add(placeOnionInPotTask2);
 
@@ -62,56 +60,50 @@ public class RecipeRepository {
         Task putSoupTask = new Task("Put onion soup in bowl", takeBowlTask, bowl, onionSoupBowl, 5);
         taskList.add(putSoupTask);
 
-        Task serveSoupTask = new Task("Serve onion soup", onionSoupBowl, null, 1);
+        Task serveSoupTask = new Task("Serve onion soup", putSoupTask, onionSoupBowl, null, 1);
         taskList.add(serveSoupTask);
-
-        // Random order to full test the solution
-        Collections.shuffle(taskList);
 
         onionSoup.setTasks(taskList);
         repository.put(ONION_SOUP_RECIPE, onionSoup);
     }
 
     // Ajout d'une seconde recette pour l'ordonnancement
-    /*private void addBrocoliSoup(Integer startTime){
+    private void addBrocoliSoup(Integer startTime){
         List<Task> taskList = new ArrayList<>();
-
         Recipe brocoliSoup = new Recipe(BROCOLI_SOUP_RECIPE, startTime);
 
-        Task takeBrocoliTask1 = new Task("Take brocoli1", true, false);
-        Task takeBrocoliTask2 = new Task("Take brocoli2", true, false);
+        Item brocoli = new Item("\uD83E\uDD66");
+        Task takeBrocoliTask1 = new Task("Take brocoli", null, brocoli, 1);
+        Task takeBrocoliTask2 = new Task("Take brocoli", null, brocoli, 1);
         taskList.add(takeBrocoliTask1);
         taskList.add(takeBrocoliTask2);
 
-        //Pour l'instant, on coupe l'objet dans les mains et le le reprends, on ne s'en discossie pas vraiment
-        Task cutBrocoliTask1 = new Task("Cut brocoli1", takeBrocoliTask1, false, false);
-        Task cutBrocoliTask2 = new Task("Cut brocoli2", takeBrocoliTask2, false, false);
+        Item brocoliCut = new Item("\uD83E\uDD66\uD83D\uDD2A");
+        Task cutBrocoliTask1 = new Task("Cut brocoli", takeBrocoliTask1, brocoli, brocoliCut, 15);
+        Task cutBrocoliTask2 = new Task("Cut brocoli", takeBrocoliTask2, brocoli, brocoliCut, 15);
         taskList.add(cutBrocoliTask1);
         taskList.add(cutBrocoliTask2);
 
-        Task placeBrocoliInPotTask1 = new Task("Place brocoli1 in pot", cutBrocoliTask1, false, true);
-        Task placeBrocoliInPotTask2 = new Task("Place brocoli2 in pot", cutBrocoliTask2, false, true);
+        Task placeBrocoliInPotTask1 = new Task("Place brocoli in pot", cutBrocoliTask1, brocoliCut, null, 1);
+        Task placeBrocoliInPotTask2 = new Task("Place brocoli in pot", cutBrocoliTask2, brocoliCut, null, 1);
         taskList.add(placeBrocoliInPotTask1);
         taskList.add(placeBrocoliInPotTask2);
 
+        Item bowl = new Item("\uD83E\uDD63");
         List<Task> takeBowlDependencies = new ArrayList<>();
         takeBowlDependencies.add(placeBrocoliInPotTask1);
         takeBowlDependencies.add(placeBrocoliInPotTask2);
-        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, true, false);
+        Task takeBowlTask = new Task("Take bowl", takeBowlDependencies, null, bowl, 1);
         taskList.add(takeBowlTask);
 
-        Task putSoupTask = new Task("Put soup in bowl", takeBowlTask, false, false);
+        Item brocoliSoupBowl = new Item("\uD83E\uDD63\uD83E\uDD66");
+        Task putSoupTask = new Task("Put brocoli soup in bowl", takeBowlTask, bowl, brocoliSoupBowl, 3);
         taskList.add(putSoupTask);
 
-        Task serveSoupTask = new Task("Serve soup", putSoupTask, false, true);
+        Task serveSoupTask = new Task("Serve brocoli soup", putSoupTask, brocoliSoupBowl, null, 1);
         taskList.add(serveSoupTask);
-
-        //TODO Tester en décommentant cette ligne, il va manquer une contrainte pour réorganiser les TaskAssignment, mais on doit leur donner un timestamp de début/fin
-        //Cette inversion a un impact majeur dans le temps de calcul, pour l'instant, avec 2 contraintes, on passe de 0.5sec à ~30 sec.
-        //taskList = taskList.reversed();
-        Collections.shuffle(taskList);
 
         brocoliSoup.setTasks(taskList);
         repository.put(BROCOLI_SOUP_RECIPE, brocoliSoup);
-    }*/
+    }
 }

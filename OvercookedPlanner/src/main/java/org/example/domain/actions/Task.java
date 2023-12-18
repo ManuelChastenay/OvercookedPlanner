@@ -41,8 +41,6 @@ public class Task extends TaskOrCharacter {
 
         if(getPreviousTask() != null) possibleValue.add(getPreviousTask().startTime + getPreviousTask().duration);
         else possibleValue.add(0);
-        //Having more than 1 variable helps the planner not crashing.
-        //possibleValue.add(0);
 
         return possibleValue;
     }
@@ -108,6 +106,10 @@ public class Task extends TaskOrCharacter {
 
     public void setCurrentRecipe(Recipe currentRecipe) {
         this.currentRecipe = currentRecipe;
+    }
+
+    public Recipe getCurrentRecipe(){
+        return currentRecipe;
     }
 
     public List<Task> getDependencies() {
